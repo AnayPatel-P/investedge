@@ -12,4 +12,10 @@ dist/
 frontend/node_modules/
 frontend/dist/
 *.tsbuildinfo
+
+# Aider (local AI pair programmer) history and caches
+.aider.chat.history.md
+.aider.input.history
+.aider.llm.history
+.aider.tags.cache.v*/
 frontend/public/data/

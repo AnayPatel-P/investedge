@@ -1,0 +1,7 @@
+# Per-model settings for the local Qwen coder model.
+- name: ollama_chat/qwen3-coder:30b
+  edit_format: diff
+  use_repo_map: true
+  extra_params:
+    # Ollama's default context is small; 32k fits easily in 48 GB alongside the model.
+    num_ctx: 32768

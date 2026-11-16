@@ -1,0 +1,18 @@
+# Aider config for InvestEdge — runs fully local via Ollama.
+# Start with: `aider` from the repo root.
+
+model: ollama_chat/qwen3-coder:30b
+set-env:
+  - OLLAMA_API_BASE=http://127.0.0.1:11434
+
+# Never commit on its own, and never sweep in-progress changes into a commit.
+# Review with `git diff`; undo a bad edit with `git checkout -- <file>`.
+auto-commits: false
+dirty-commits: false
+
+# Don't let aider rewrite .gitignore (it would ignore this config file too).
+gitignore: false
+
+# Keep everything local.
+analytics-disable: true
+check-update: false
