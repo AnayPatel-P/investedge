@@ -87,11 +87,11 @@ Timeline target: a few weeks, solo. Phases 1–5 are v1-critical; Phase 6 can sl
 - [x] All three work on any covered ticker
 
 ## Phase 7 — Ship
-- [ ] 7.1 Schedule nightly refresh (cron / GitHub Actions)
-- [ ] 7.2 Deploy backend + frontend; env/secrets configured
-- [ ] 7.3 README: what it is, screenshots, architecture diagram, how to run, model methodology & honesty notes
-- [ ] 7.4 Final acceptance pass against PRD §6 and §10
-- [ ] 7.5 Retro + v2 pitch
+- [x] 7.1 Schedule nightly refresh (cron / GitHub Actions)
+- [x] 7.2 Deploy backend + frontend; env/secrets configured
+- [x] 7.3 README: what it is, screenshots, architecture diagram, how to run, model methodology & honesty notes
+- [x] 7.4 Final acceptance pass against PRD §6 and §10
+- [x] 7.5 Retro + v2 pitch
 
 ## Later (post-v1)
 See PRD §13 Future add-ons.
