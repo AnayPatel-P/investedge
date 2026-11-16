@@ -30,6 +30,7 @@ backend/src/investedge/
   models/          forecasters (naive, ARIMA, ETS, Prophet, GARCH)
   backtest.py      rolling-origin backtest + scorecard + plain-English verdicts
   risk.py          risk metrics, risk profiles, screener, example portfolios
+  patterns.py      candlestick pattern detection + honest hit rates
   pipeline.py      batch jobs
   storage.py       DuckDB store (batch writes, API reads)
   api.py           FastAPI read-only API
@@ -66,6 +67,7 @@ Quality check: `cd backend && uv run python evals/tutor_eval.py` (real API calls
 | `GET /api/stocks/{s}/forecasts` | 30-day forecasts with 80/95% bands per model |
 | `GET /api/stocks/{s}/metrics` | Risk metrics, risk score/level, profile fit |
 | `GET /api/stocks/{s}/scorecard` | Backtest accuracy vs. naive baseline + verdict |
+| `GET /api/stocks/{s}/patterns` | Candlestick patterns + each pattern's track record on this stock |
 | `GET /api/stocks/{s}/backtest` | Past forecasts at each replay date vs. what happened |
 | `GET /api/screener?profile=` | Stocks ranked by fit for a profile |
 | `GET /api/example-portfolios?profile=` | Rule-based example basket + diversification lesson |

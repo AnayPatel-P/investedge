@@ -81,10 +81,10 @@ Timeline target: a few weeks, solo. Phases 1–5 are v1-critical; Phase 6 can sl
 **Goal:** Time Machine, candlestick patterns, glossary.
 **Demo:** rewind MSFT to a date a year ago and watch predictions vs. reality; click a labelled "hammer" candle to learn it.
 - [x] 6.1 ~~Time Machine~~ → moved to Phase 4 as "Rewind & Release" (D35)
-- [ ] 6.2 Candlestick pattern detection (≥5 patterns) + chart markers + learn cards
-- [ ] 6.3 Glossary data + tooltips on every metric/term
+- [x] 6.2 Candlestick pattern detection (7 patterns) + chart markers + learn cards with each pattern's honest track record on the stock (D49)
+- [x] 6.3 Glossary (19 terms) + accessible `<Term>` tooltips across stock, screener, scorecard, patterns and portfolio pages
 **Done when:**
-- [ ] All three work on any covered ticker
+- [x] All three work on any covered ticker
 
 ## Phase 7 — Ship
 - [ ] 7.1 Schedule nightly refresh (cron / GitHub Actions)

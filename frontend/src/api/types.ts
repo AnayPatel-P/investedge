@@ -155,3 +155,25 @@ export type ChatEvent =
   | { type: "replace"; text: string }
   | { type: "error"; message: string }
   | { type: "done" };
+
+export interface PatternInfo {
+  key: string;
+  name: string;
+  bias: "bullish" | "bearish" | "neutral";
+  shape: string;
+  count: number;
+  higher_after: number | null;
+  base_rate: number;
+  verdict: string;
+}
+export interface PatternHit {
+  date: string;
+  pattern: string;
+  direction: "bullish" | "bearish" | "neutral";
+}
+export interface Patterns {
+  symbol: string;
+  forward_days: number;
+  library: PatternInfo[];
+  occurrences: PatternHit[];
+}

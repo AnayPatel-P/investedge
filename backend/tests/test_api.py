@@ -93,3 +93,7 @@ def test_summary_api_error_becomes_503(client, monkeypatch):
     r = client.get("/api/stocks/AAA/summary?profile=moderate")
     assert r.status_code == 503
     assert "unavailable" in r.json()["detail"]
+
+
+def test_patterns_endpoint_404_for_unknown(client):
+    assert client.get("/api/stocks/ZZZ/patterns").status_code == 404

@@ -7,7 +7,7 @@ import logging
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
 
-from investedge import backtest, risk, storage
+from investedge import backtest, patterns, risk, storage
 from investedge.config import settings
 
 log = logging.getLogger(__name__)
@@ -144,6 +144,39 @@ def stock_scorecard(symbol: str) -> dict:
         "verdict": backtest.verdict(sym, card),
         "coverage_note": backtest.coverage_note(card),
         "models": _records(card),
+    }
+
+
+@app.get("/api/stocks/{symbol}/patterns")
+def stock_patterns(symbol: str, days: int = Query(260, ge=20, le=1300)) -> dict:
+    """Candlestick patterns in the last `days` sessions, plus each pattern's track record on
+    this stock's full history (how often the price was higher a few days later vs. any day)."""
+    sym = symbol.upper()
+    with storage.connect(read_only=True) as con:
+        ohlc = con.execute(
+            "SELECT date, open, high, low, close FROM prices WHERE symbol = ? ORDER BY date", [sym]
+        ).df()
+    if ohlc.empty:
+        raise HTTPException(404, f"No price data for {sym}")
+    found = patterns.detect(ohlc)
+    stats = patterns.hit_rates(ohlc, found)
+    cutoff = pd.to_datetime(ohlc["date"]).iloc[max(0, len(ohlc) - days)]
+    recent = found[pd.to_datetime(found["date"]) >= cutoff]
+    return {
+        "symbol": sym,
+        "forward_days": patterns.FORWARD_DAYS,
+        "library": [
+            {
+                "key": p.key,
+                "name": p.name,
+                "bias": p.bias,
+                "shape": p.shape,
+                **stats[p.key],
+                "verdict": patterns.verdict(p, stats[p.key]),
+            }
+            for p in patterns.PATTERNS.values()
+        ],
+        "occurrences": _records(recent.assign(date=pd.to_datetime(recent["date"]).dt.date)),
     }
 
 

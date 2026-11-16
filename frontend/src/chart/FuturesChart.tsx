@@ -8,7 +8,7 @@ import {
   type UTCTimestamp,
 } from "lightweight-charts";
 import { useEffect, useMemo, useRef } from "react";
-import type { ForecastPoint, ModelKey, PriceBar } from "../api/types";
+import type { ForecastPoint, ModelKey, PatternHit, PriceBar } from "../api/types";
 import { MODEL_LABEL } from "../format";
 import { bandAt, easeOut, samplePaths } from "./trails";
 import "./FuturesChart.css";
@@ -38,6 +38,9 @@ export interface FuturesChartProps {
   replay: boolean;
   onPhase?: (p: Phase) => void;
   onHover?: (bar: PriceBar | null) => void;
+  /** Candlestick pattern markers (candles mode only). */
+  markers?: PatternHit[];
+  onMarkerClick?: (date: string) => void;
 }
 
 const toTime = (iso: string) => (Date.parse(`${iso}T00:00:00Z`) / 1000) as UTCTimestamp;
@@ -104,10 +107,18 @@ export function FuturesChart(props: FuturesChartProps) {
       cb(propsRef.current.bars.find((b) => b.date === iso) ?? null);
     };
     chart.subscribeCrosshairMove(onMove);
+    const onClick = (p: MouseEventParams<Time>) => {
+      const cb = propsRef.current.onMarkerClick;
+      if (!cb || !p.time) return;
+      const iso = new Date((p.time as number) * 1000).toISOString().slice(0, 10);
+      if (propsRef.current.markers?.some((m) => m.date === iso)) cb(iso);
+    };
+    chart.subscribeClick(onClick);
 
     return () => {
       ro.disconnect();
       chart.unsubscribeCrosshairMove(onMove);
+      chart.unsubscribeClick(onClick);
       chart.remove();
       chartRef.current = null;
       mainRef.current = null;
@@ -209,6 +220,27 @@ export function FuturesChart(props: FuturesChartProps) {
     requestAnimationFrame(draw);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bars, mode, range, forecasts, focus, visibleModels, level, reality, replay]);
+
+  // Pattern markers: teal ▲ below "bullish" candles, rust ▼ above "bearish", ink dot for neutral.
+  useEffect(() => {
+    const main = mainRef.current;
+    if (!main) return;
+    const last = bars.length ? bars[bars.length - 1].date : "";
+    const ms =
+      mode === "candles" && props.markers
+        ? props.markers
+            .filter((m) => m.date <= last)
+            .map((m) => ({
+              time: toTime(m.date),
+              position: m.direction === "bearish" ? ("aboveBar" as const) : ("belowBar" as const),
+              color: css(m.direction === "bullish" ? "--up" : m.direction === "bearish" ? "--down" : "--ink-soft"),
+              shape: m.direction === "bullish" ? ("arrowUp" as const) : m.direction === "bearish" ? ("arrowDown" as const) : ("circle" as const),
+              size: 0.8,
+            }))
+        : [];
+    main.setMarkers(ms);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [props.markers, bars, mode]);
 
   // Release → reality animation.
   useEffect(() => {

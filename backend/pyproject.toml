@@ -51,6 +51,7 @@ select = ["E", "F", "I", "B", "UP", "SIM"]
 # Prompt text and tool descriptions read better unwrapped.
 "src/investedge/ai/*" = ["E501"]
 "evals/*" = ["E501"]
+"src/investedge/patterns.py" = ["E501"]  # plain-English pattern descriptions
 
 [tool.mypy]
 python_version = "3.12"

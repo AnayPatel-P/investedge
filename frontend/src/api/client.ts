@@ -6,6 +6,7 @@ import type {
   ExamplePortfolio,
   Forecasts,
   Metrics,
+  Patterns,
   PriceBar,
   Profile,
   ProfileKey,
@@ -58,6 +59,8 @@ export const useSearch = (q: string) =>
 export const usePrices = (s: string) => useQuery({ queryKey: ["prices", s], queryFn: () => get<PriceBar[]>(`/stocks/${sym(s)}/prices`), ...opts });
 export const useForecasts = (s: string) => useQuery({ queryKey: ["forecasts", s], queryFn: () => get<Forecasts>(`/stocks/${sym(s)}/forecasts`), ...opts });
 export const useBacktest = (s: string) => useQuery({ queryKey: ["backtest", s], queryFn: () => get<Backtest>(`/stocks/${sym(s)}/backtest`), ...opts });
+export const usePatterns = (s: string, enabled: boolean) =>
+  useQuery({ queryKey: ["patterns", s], queryFn: () => get<Patterns>(`/stocks/${sym(s)}/patterns?days=1300`), enabled, ...opts });
 export const useMetrics = (s: string) => useQuery({ queryKey: ["metrics", s], queryFn: () => get<Metrics>(`/stocks/${sym(s)}/metrics`), ...opts });
 export const useScorecard = (s: string) => useQuery({ queryKey: ["scorecard", s], queryFn: () => get<Scorecard>(`/stocks/${sym(s)}/scorecard`), ...opts });
 

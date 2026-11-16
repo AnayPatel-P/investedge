@@ -4,6 +4,7 @@ import { useScreener } from "../api/client";
 import type { Fit, ProfileKey, ScreenerRow } from "../api/types";
 import { FitBadge, RiskMeter } from "../components/Badges";
 import { ProfilePicker } from "../components/ProfilePicker";
+import { Term } from "../components/Term";
 import { num, pct, signedPct } from "../format";
 import { usePrefs } from "../state/prefs";
 import "./Home.css";
@@ -50,7 +51,9 @@ function Filters({
   return (
     <div className="filters">
       <label>
-        <span className="kicker">Sector</span>
+        <span className="kicker">
+          <Term k="sector">Sector</Term>
+        </span>
         <select value={sector} onChange={(e) => setSector(e.target.value)}>
           <option value="">All 11 sectors</option>
           {SECTORS.map((s) => (
@@ -87,8 +90,9 @@ function Guided({ profile }: { profile: ProfileKey }) {
         <p className="kicker">For {profile === "aggressive" ? "an" : "a"} {profile} investor · {rows.length} stocks</p>
         <h1 className="home-title">{HEADLINE[profile]}</h1>
         <p className="home-lede">
-          Every S&amp;P 500 stock, ordered by how well its past swings match the ride you chose — then by how much return it
-          earned for each unit of risk over the last year. That's a description of the past, not a tip.
+          Every S&amp;P 500 stock, ordered by how well its past <Term k="volatility">swings</Term> match the ride you chose —
+          then by how much <Term k="returnPerRisk">return it earned for each unit of risk</Term> over the last year. That's a
+          description of the past, not a tip.
         </p>
         <Filters sector={sector} setSector={setSector} fit={fit} setFit={setFit} />
       </header>

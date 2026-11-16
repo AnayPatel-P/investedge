@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { usePortfolio } from "../api/client";
 import type { ProfileKey } from "../api/types";
 import { pct, signedPct } from "../format";
+import { Term } from "../components/Term";
 import { usePrefs } from "../state/prefs";
 import "./Portfolios.css";
 
@@ -19,7 +20,7 @@ export function Portfolios() {
         <p className="kicker">Example portfolios · for learning</p>
         <h1 className="pf-title">Ten stocks swing less than one.</h1>
         <p className="pf-lede">
-          See what spreading money across sectors does to the ride. These baskets are built by a fixed, visible rule from past data —
+          See what <Term k="diversification">spreading money across sectors</Term> does to the ride. These baskets are built by a fixed, visible rule from past data —
           they're illustrations, not recommendations.
         </p>
         <div className="segmented" role="group" aria-label="Profile">

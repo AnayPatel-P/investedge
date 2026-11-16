@@ -1,5 +1,7 @@
 import type { Scorecard } from "../api/types";
 import { MODEL_BLURB, MODEL_LABEL, pct } from "../format";
+import type { GlossaryKey } from "../glossary";
+import { Term } from "./Term";
 import "./ScorecardPanel.css";
 
 const ORDER = ["naive", "arima", "ets", "prophet", "garch"];
@@ -10,7 +12,9 @@ export function ScorecardPanel({ card, compact = false }: { card: Scorecard; com
   const origins = rows[0]?.n_origins ?? 0;
   return (
     <section className={`scorecard${compact ? " compact" : ""}`} aria-labelledby="scorecard-title">
-      <p className="kicker">The scorecard · {origins} replays over the past year</p>
+      <p className="kicker">
+        The scorecard · {origins} <Term k="backtest">replays</Term> over the past year
+      </p>
       <h2 id="scorecard-title" className="visually-hidden">
         Forecast scorecard
       </h2>
@@ -27,11 +31,11 @@ export function ScorecardPanel({ card, compact = false }: { card: Scorecard; com
           <thead>
             <tr>
               <th scope="col">Model</th>
-              <th scope="col" title="How much smaller its typical miss was than the naive guess's">
-                vs. naive guess
+              <th scope="col">
+                <Term k="skill">vs. naive guess</Term>
               </th>
-              <th scope="col" title="How often the real price landed inside the model's 95% range (target: 95%)">
-                Caught by 95% range
+              <th scope="col">
+                <Term k="coverage">Caught by 95% range</Term>
               </th>
               <th scope="col" title="Average miss as a share of the price">
                 Typical miss
@@ -47,7 +51,9 @@ export function ScorecardPanel({ card, compact = false }: { card: Scorecard; com
               return (
                 <tr key={r.model}>
                   <th scope="row">
-                    <span className="score-model">{MODEL_LABEL[r.model]}</span>
+                    <span className="score-model">
+                      <Term k={r.model as GlossaryKey}>{MODEL_LABEL[r.model]}</Term>
+                    </span>
                     {!compact && <span className="score-blurb muted">{MODEL_BLURB[r.model]}</span>}
                   </th>
                   <td>

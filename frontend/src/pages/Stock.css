@@ -254,3 +254,14 @@
     animation: none;
   }
 }
+
+.stock-patterns {
+  margin-top: var(--s-6);
+  border-top: var(--hairline-strong);
+  padding-top: var(--s-5);
+}
+.patterns-toggle[aria-pressed="true"] {
+  background: var(--forecast);
+  border-color: var(--forecast);
+  color: var(--paper);
+}

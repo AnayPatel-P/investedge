@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ApiError, useBacktest, useForecasts, useMetrics, usePrices, useProfiles, useScorecard } from "../api/client";
+import { ApiError, useBacktest, useForecasts, useMetrics, usePatterns, usePrices, useProfiles, useScorecard } from "../api/client";
 import type { ForecastPoint, ModelKey, PriceBar, Profile } from "../api/types";
 import { FuturesChart, type ChartMode, type Phase, type Range } from "../chart/FuturesChart";
 import { Scrubber } from "../chart/Scrubber";
@@ -9,6 +9,8 @@ import { bandAt } from "../chart/trails";
 import { FitBadge, RiskMeter } from "../components/Badges";
 import { Dial } from "../components/Dial";
 import { MetricsLedger } from "../components/MetricsLedger";
+import { Term } from "../components/Term";
+import { PatternPanel } from "../components/PatternPanel";
 import { ScorecardPanel } from "../components/ScorecardPanel";
 import { Tutor } from "../components/Tutor";
 import { MODEL_BLURB, MODEL_LABEL, longDate, price, shortDate, signedPct } from "../format";
@@ -53,6 +55,9 @@ export function Stock() {
   const [releaseKey, setReleaseKey] = useState(0);
   const [phase, setPhase] = useState<Phase>("idle");
   const [hover, setHover] = useState<PriceBar | null>(null);
+  const [showPatterns, setShowPatterns] = useState(false);
+  const [pickedMarker, setPickedMarker] = useState<string | null>(null);
+  const patterns = usePatterns(sym, showPatterns);
 
   // Re-apply profile defaults when the profile (or stock) changes.
   useEffect(() => {
@@ -144,7 +149,11 @@ export function Stock() {
             </span>
           )}
           {m && <RiskMeter score={m.risk_score} level={m.risk_level} />}
-          {m && <span className="stock-risk-line muted">{m.risk_sentence}</span>}
+          {m && (
+            <span className="stock-risk-line muted">
+              <Term k="riskScore">{m.risk_sentence}</Term>
+            </span>
+          )}
         </div>
       </header>
 
@@ -161,6 +170,19 @@ export function Stock() {
                   Line
                 </button>
               </div>
+              <button
+                type="button"
+                className="btn patterns-toggle"
+                aria-pressed={showPatterns}
+                onClick={() => {
+                  setShowPatterns((v) => !v);
+                  setMode("candles");
+                  setPickedMarker(null);
+                }}
+                title="Mark classic candlestick patterns and check whether they meant anything"
+              >
+                {showPatterns ? "◆ Patterns on" : "◇ Patterns"}
+              </button>
               <div className="segmented" role="group" aria-label="Time range">
                 {RANGES.map((r) => (
                   <button key={r} type="button" aria-pressed={range === r && !replayOrigin} disabled={!!replayOrigin} onClick={() => setRange(r)}>
@@ -234,6 +256,8 @@ export function Stock() {
               replay={!!replayOrigin}
               onPhase={setPhase}
               onHover={setHover}
+              markers={showPatterns && !replayOrigin ? patterns.data?.occurrences : undefined}
+              onMarkerClick={setPickedMarker}
             />
           ) : (
             <div className="skeleton chart-skeleton" aria-hidden="true" />
@@ -248,7 +272,8 @@ export function Stock() {
                 </>
               ) : (
                 <>
-                  Each faint line is one possible future. {MODEL_LABEL[focus]}'s {level}% range says that by{" "}
+                  Each faint line is one possible future. {MODEL_LABEL[focus]}'s{" "}
+                  <Term k="forecastRange">{level}% range</Term> says that by{" "}
                   <strong>{shortDate(focusPts[focusPts.length - 1].date)}</strong> the price should land between{" "}
                   <strong className="num">{price(endBand.lo)}</strong> and <strong className="num">{price(endBand.hi)}</strong>{" "}
                   {level} times out of 100 — if the model is honest. The scorecard below checks that.
@@ -288,6 +313,13 @@ export function Stock() {
           {replayOrigin && tally && (
             <TallyCard tally={tally} level={level} show={phase === "done"} totals={totals} />
           )}
+
+          {showPatterns && patterns.data && (
+            <div className="stock-patterns">
+              <PatternPanel data={patterns.data} selected={pickedMarker} symbol={sym} />
+            </div>
+          )}
+          {showPatterns && patterns.isLoading && <div className="skeleton" style={{ height: 200, marginTop: 24 }} aria-hidden="true" />}
         </section>
 
         {/* ------------------------------------------------ side: confidence dial, scorecard, metrics */}
