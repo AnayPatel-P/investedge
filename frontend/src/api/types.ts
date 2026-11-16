@@ -137,3 +137,21 @@ export interface ExamplePortfolio {
   };
   lesson: string;
 }
+
+export interface AiStatus {
+  configured: boolean;
+  model: string;
+}
+export interface Summary {
+  symbol: string;
+  profile: ProfileKey;
+  as_of: string;
+  text: string;
+  cached: boolean;
+}
+export type ChatEvent =
+  | { type: "text"; text: string }
+  | { type: "tool"; name: string; symbol: string | null; ok: boolean }
+  | { type: "replace"; text: string }
+  | { type: "error"; message: string }
+  | { type: "done" };

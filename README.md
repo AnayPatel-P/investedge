@@ -49,7 +49,14 @@ from what a model knew then, and see the real price draw itself through them. A 
 reality landed inside the range and whether the model beat the naive guess. Toggle **Guided ↔ Terminal**
 for an editorial or a dense view.
 
-## API (read-only)
+## AI tutor (optional)
+Add `ANTHROPIC_API_KEY=...` to `investedge/.env` (git-ignored) to enable a plain-English briefing and a
+grounded chat on each stock page, powered by Claude (`claude-opus-5-5`). The tutor looks numbers up through
+read-only tools, never gives buy/sell advice, and is capped by per-IP rate limits and a daily budget
+(`INVESTEDGE_AI_DAILY_BUDGET_USD`, default $3). Without a key, everything else works and the panel says so.
+Quality check: `cd backend && uv run python evals/tutor_eval.py` (real API calls, < $1).
+
+## API
 | Endpoint | What it returns |
 |----------|-----------------|
 | `GET /api/tickers` | Constituents with last price date and `stale` flag |
@@ -63,6 +70,9 @@ for an editorial or a dense view.
 | `GET /api/screener?profile=` | Stocks ranked by fit for a profile |
 | `GET /api/example-portfolios?profile=` | Rule-based example basket + diversification lesson |
 | `GET /api/runs/latest` | Latest pipeline run report |
+| `GET /api/ai/status` | Whether the AI tutor is configured |
+| `GET /api/stocks/{s}/summary?profile=` | Cached AI briefing (needs key) |
+| `POST /api/stocks/{s}/chat` | Streaming tutor chat, NDJSON events (needs key) |
 
 ## Honest results (past year, 499 stocks)
 ARIMA beat the "price stays the same" baseline on 8.8% of stocks; ETS and Prophet on 2.4%.

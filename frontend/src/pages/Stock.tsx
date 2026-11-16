@@ -10,6 +10,7 @@ import { FitBadge, RiskMeter } from "../components/Badges";
 import { Dial } from "../components/Dial";
 import { MetricsLedger } from "../components/MetricsLedger";
 import { ScorecardPanel } from "../components/ScorecardPanel";
+import { Tutor } from "../components/Tutor";
 import { MODEL_BLURB, MODEL_LABEL, longDate, price, shortDate, signedPct } from "../format";
 import { usePrefs } from "../state/prefs";
 import "./Stock.css";
@@ -314,13 +315,9 @@ export function Stock() {
         </section>
       )}
 
-      <section className="stock-section ai-slot" aria-label="AI tutor">
-        <p className="kicker">AI tutor</p>
-        <p className="muted">
-          A plain-English summary of {sym} and a chat you can ask questions — grounded in the numbers on this page — arrive in the
-          next build phase.
-        </p>
-      </section>
+      <div className="stock-section">
+        <Tutor symbol={sym} profile={profile} />
+      </div>
     </article>
   );
 }

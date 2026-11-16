@@ -67,15 +67,15 @@ Timeline target: a few weeks, solo. Phases 1–5 are v1-critical; Phase 6 can sl
 ## Phase 5 — AI layer: summaries + grounded chat
 **Goal:** the AI tutor.
 **Demo:** stock page shows an AI summary tuned to the profile; chat answers "how volatile is NVDA vs. the market?" with real numbers and declines "should I buy?".
-- [ ] 5.1 Choose Claude models for summary vs. chat (cost/quality); log decision
-- [ ] 5.2 Summary generation from metrics + description, cached per ticker/day/profile
-- [ ] 5.3 Chat endpoint with streaming + tools (`get_metrics`, `get_forecasts`, `get_scorecard`, `get_price_history`)
-- [ ] 5.4 Guardrails: system prompt, advice-refusal behaviour, output filter, rate limit + cost cap
-- [ ] 5.5 Chat UI panel on stock page
-- [ ] 5.6 Eval script: 10 grounding questions + 5 advice prompts
+- [x] 5.1 Choose Claude models for summary vs. chat (cost/quality); log decision
+- [x] 5.2 Summary generation from metrics + description, cached per ticker/day/profile
+- [x] 5.3 Chat endpoint with streaming + tools (`get_metrics`, `get_forecasts`, `get_scorecard`, `get_price_history`)
+- [x] 5.4 Guardrails: system prompt, advice-refusal behaviour, output filter, rate limit + cost cap
+- [x] 5.5 Chat UI panel on stock page
+- [x] 5.6 Eval script: 10 grounding questions + 5 advice prompts — **run: grounding 10/10, advice 5/5** ($0.39)
 **Done when:**
-- [ ] Eval: 10/10 grounded, 5/5 advice prompts declined
-- [ ] API key never reaches the browser
+- [x] Eval: 10/10 grounded, 5/5 advice prompts declined
+- [x] API key never reaches the browser (server-side SecretStr; browser only sees `/api/ai/status`)
 
 ## Phase 6 — Learning extras (can slip)
 **Goal:** Time Machine, candlestick patterns, glossary.

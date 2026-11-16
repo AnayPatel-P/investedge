@@ -1,6 +1,8 @@
 """Read-only HTTP API over the precomputed DuckDB store."""
 
+import asyncio
 import json
+import logging
 
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
@@ -8,6 +10,7 @@ from fastapi import FastAPI, HTTPException, Query
 from investedge import backtest, risk, storage
 from investedge.config import settings
 
+log = logging.getLogger(__name__)
 app = FastAPI(title="InvestEdge API", version="0.1.0")
 
 
@@ -219,3 +222,135 @@ def example_portfolio(profile: str) -> dict:
         "stats": stats,
         "lesson": risk.portfolio_lesson(p.key, stats),
     }
+
+
+# ------------------------------------------------------------------------------- AI tutor
+# Imported lazily-safe: the module works without an API key and reports "not configured".
+
+import anthropic  # noqa: E402
+from fastapi import Request  # noqa: E402
+from fastapi.responses import StreamingResponse  # noqa: E402
+from pydantic import BaseModel, Field  # noqa: E402
+
+from investedge.ai import guard, tutor  # noqa: E402
+
+_limiter = guard.RateLimiter()
+
+
+def _client_key(request: Request) -> str:
+    return request.client.host if request.client else "unknown"
+
+
+@app.get("/api/ai/status")
+def ai_status() -> dict:
+    return {"configured": settings.anthropic_api_key is not None, "model": settings.ai_model}
+
+
+@app.get("/api/stocks/{symbol}/summary")
+async def stock_summary(symbol: str, profile: str, request: Request) -> dict:
+    p = _profile(profile)
+    sym = symbol.upper()
+    if not await asyncio.to_thread(_known, sym):
+        raise HTTPException(404, f"{sym} isn't in the S&P 500 almanac")
+    hit = await tutor.cached_summary(sym, p.key)
+    if hit:
+        return hit
+    if settings.anthropic_api_key is None:
+        raise HTTPException(503, "AI tutor not configured")
+    if not _limiter.allow(_client_key(request), "summary", settings.ai_summary_per_hour):
+        raise HTTPException(429, "Too many summaries this hour - try again later")
+    try:
+        return await tutor.summarize(sym, p.key)
+    except guard.BudgetExceeded as exc:
+        raise HTTPException(503, "The AI tutor has used today's budget - back tomorrow") from exc
+    except anthropic.APIStatusError as exc:  # billing, rate limits, outages: never a raw 500
+        log.warning("summary failed for %s: %s (request %s)", sym, exc.status_code, exc.request_id)
+        raise HTTPException(503, "The AI tutor is unavailable right now - try again later") from exc
+    except anthropic.APIConnectionError as exc:
+        raise HTTPException(503, "The AI tutor couldn't be reached - try again later") from exc
+
+
+class ChatTurn(BaseModel):
+    role: str
+    content: str = Field(max_length=6000)
+
+
+class ChatRequest(BaseModel):
+    profile: str | None = None
+    messages: list[ChatTurn] = Field(min_length=1, max_length=40)
+
+
+@app.post("/api/stocks/{symbol}/chat")
+async def stock_chat(symbol: str, body: ChatRequest, request: Request) -> StreamingResponse:
+    sym = symbol.upper()
+    profile = _profile(body.profile).key if body.profile else None
+    if not await asyncio.to_thread(_known, sym):
+        raise HTTPException(404, f"{sym} isn't in the S&P 500 almanac")
+    if settings.anthropic_api_key is None:
+        raise HTTPException(503, "AI tutor not configured")
+    history = [t.model_dump() for t in body.messages]
+    try:
+        tutor.clean_history(history)
+    except ValueError as exc:
+        raise HTTPException(400, str(exc)) from exc
+    if not _limiter.allow(_client_key(request), "chat", settings.ai_chat_per_hour):
+        raise HTTPException(
+            429, "You've asked a lot this hour - take a breather and try again later"
+        )
+
+    async def events():
+        try:
+            async for ev in tutor.chat(sym, profile, history):
+                yield json.dumps(ev) + "\n"
+        except guard.BudgetExceeded:
+            yield (
+                json.dumps(
+                    {
+                        "type": "error",
+                        "message": "The AI tutor has used today's budget - back tomorrow.",
+                    }
+                )
+                + "\n"
+            )
+        except (
+            anthropic.APIStatusError
+        ) as exc:  # billing, rate limits, outages: one line, no traceback
+            log.warning("chat failed for %s: %s (request %s)", sym, exc.status_code, exc.request_id)
+            yield (
+                json.dumps(
+                    {
+                        "type": "error",
+                        "message": "The tutor is unavailable right now. Please try again later.",
+                    }
+                )
+                + "\n"
+            )
+        except anthropic.APIConnectionError:
+            log.warning("chat for %s could not reach the Anthropic API", sym)
+            yield (
+                json.dumps(
+                    {
+                        "type": "error",
+                        "message": "The tutor couldn't be reached. Please try again later.",
+                    }
+                )
+                + "\n"
+            )
+        except Exception:  # noqa: BLE001 - never leak internals to the browser
+            log.exception("chat failed for %s", sym)
+            yield (
+                json.dumps(
+                    {"type": "error", "message": "The tutor hit a problem. Please try again."}
+                )
+                + "\n"
+            )
+
+    return StreamingResponse(
+        events(), media_type="application/x-ndjson", headers={"Cache-Control": "no-store"}
+    )
+
+
+def _known(sym: str) -> bool:
+    from investedge.ai import facts
+
+    return facts.known_symbol(sym)

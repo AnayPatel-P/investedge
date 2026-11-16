@@ -1,0 +1,161 @@
+.tutor {
+  display: grid;
+  gap: var(--s-4);
+  border-top: var(--hairline-strong);
+  padding-top: var(--s-5);
+  max-width: 900px;
+}
+.tutor-head {
+  display: grid;
+  gap: var(--s-2);
+}
+.tutor-note {
+  font-size: var(--step--1);
+  max-width: 70ch;
+}
+.tutor-off {
+  padding: var(--s-3) var(--s-4);
+  border: 1px dashed var(--rule-strong);
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+
+/* the briefing reads like a printed column with a drop cap */
+.briefing {
+  display: grid;
+  gap: var(--s-2);
+}
+.briefing-text {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  line-height: 1.5;
+  max-width: 62ch;
+  font-variation-settings: "opsz" 24;
+}
+.briefing-text p {
+  margin: 0 0 0.6em;
+}
+.briefing-text > p:first-child::first-letter {
+  float: left;
+  font-size: 3.1em;
+  line-height: 0.85;
+  padding: 0.06em 0.08em 0 0;
+  color: var(--forecast-text);
+  font-weight: 600;
+}
+.briefing-skeleton {
+  display: grid;
+  gap: 8px;
+}
+.briefing-skeleton span {
+  height: 1em;
+  display: block;
+}
+
+.starters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+.starter {
+  border: var(--hairline-strong);
+  background: var(--surface);
+  border-radius: var(--radius-1);
+  padding: 0.45em 0.8em;
+  cursor: pointer;
+  font-size: var(--step--1);
+  text-align: left;
+}
+.starter:hover {
+  border-color: var(--ink);
+}
+
+.chat-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: var(--s-4);
+}
+.turn {
+  display: grid;
+  grid-template-columns: 2rem 1fr;
+  gap: var(--s-2);
+}
+.turn-mark {
+  color: var(--forecast-text);
+  font-weight: 600;
+  padding-top: 2px;
+}
+.turn.user .turn-text {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--step-1);
+}
+.turn.assistant .turn-text {
+  max-width: 68ch;
+}
+.turn-text p {
+  margin: 0 0 0.65em;
+}
+.turn-text ul,
+.turn-text ol {
+  margin: 0 0 0.65em;
+  padding-left: 1.2em;
+}
+.turn-text li {
+  margin: 0.2em 0;
+}
+.turn-text li::marker {
+  color: var(--forecast-text);
+}
+.turn-text strong {
+  font-weight: 600;
+}
+.turn.user .turn-text p {
+  margin: 0;
+}
+.lookups {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px var(--s-3);
+  font-size: 0.72rem;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.thinking {
+  font-style: italic;
+  animation: breathe 1.6s ease-in-out infinite;
+}
+@keyframes breathe {
+  50% {
+    opacity: 0.45;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .thinking {
+    animation: none;
+  }
+}
+
+.chat-form {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--s-2);
+  align-items: end;
+}
+.chat-form textarea {
+  font: inherit;
+  font-size: var(--step-0);
+  padding: 0.6em 0.8em;
+  border: var(--hairline-strong);
+  border-radius: var(--radius-1);
+  background: var(--surface);
+  color: var(--ink);
+  resize: vertical;
+  min-height: 2.8em;
+}
+.chat-form .btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

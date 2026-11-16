@@ -1,6 +1,8 @@
 import { useQuery } from "@tanstack/react-query";
 import type {
+  AiStatus,
   Backtest,
+  ChatEvent,
   ExamplePortfolio,
   Forecasts,
   Metrics,
@@ -9,6 +11,7 @@ import type {
   ProfileKey,
   Scorecard,
   Screener,
+  Summary,
   Ticker,
 } from "./types";
 
@@ -67,3 +70,52 @@ export const useScreener = (profile: ProfileKey, sector?: string) =>
 
 export const usePortfolio = (profile: ProfileKey) =>
   useQuery({ queryKey: ["portfolio", profile], queryFn: () => get<ExamplePortfolio>(`/example-portfolios?profile=${profile}`), ...opts });
+
+export const useAiStatus = () => useQuery({ queryKey: ["ai-status"], queryFn: () => get<AiStatus>("/ai/status"), ...opts });
+
+export const useSummary = (s: string, profile: ProfileKey, enabled: boolean) =>
+  useQuery({
+    queryKey: ["summary", s, profile],
+    queryFn: () => get<Summary>(`/stocks/${sym(s)}/summary?profile=${profile}`),
+    enabled,
+    ...opts,
+    retry: false,
+  });
+
+/** POST a chat turn and stream NDJSON events back. */
+export async function streamChat(
+  symbol: string,
+  body: { profile: ProfileKey | null; messages: { role: "user" | "assistant"; content: string }[] },
+  onEvent: (e: ChatEvent) => void,
+  signal?: AbortSignal,
+): Promise<void> {
+  const res = await fetch(`/api/stocks/${sym(symbol)}/chat`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(body),
+    signal,
+  });
+  if (!res.ok || !res.body) {
+    let detail = res.statusText;
+    try {
+      detail = (await res.json()).detail ?? detail;
+    } catch {
+      /* ignore */
+    }
+    throw new ApiError(res.status, typeof detail === "string" ? detail : "Request failed");
+  }
+  const reader = res.body.getReader();
+  const decoder = new TextDecoder();
+  let buf = "";
+  for (;;) {
+    const { done, value } = await reader.read();
+    if (done) break;
+    buf += decoder.decode(value, { stream: true });
+    let nl: number;
+    while ((nl = buf.indexOf("\n")) >= 0) {
+      const line = buf.slice(0, nl).trim();
+      buf = buf.slice(nl + 1);
+      if (line) onEvent(JSON.parse(line) as ChatEvent);
+    }
+  }
+}

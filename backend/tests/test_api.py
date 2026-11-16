@@ -52,3 +52,44 @@ def test_backtest_endpoint_empty_for_unknown(client) -> None:
 def test_search_and_bad_profile(client) -> None:
     assert client.get("/api/search?q=alp").json()[0]["symbol"] == "AAA"
     assert client.get("/api/screener?profile=yolo").status_code == 400
+
+
+def test_ai_endpoints_report_not_configured(client, monkeypatch):
+    from investedge.config import settings
+
+    monkeypatch.setattr(settings, "anthropic_api_key", None)
+    assert client.get("/api/ai/status").json()["configured"] is False
+    r = client.post("/api/stocks/AAA/chat", json={"messages": [{"role": "user", "content": "hi"}]})
+    assert r.status_code == 503
+    assert (
+        client.post(
+            "/api/stocks/ZZZ/chat", json={"messages": [{"role": "user", "content": "hi"}]}
+        ).status_code
+        == 404
+    )
+
+
+def test_summary_api_error_becomes_503(client, monkeypatch):
+    import anthropic
+    import httpx2
+    from pydantic import SecretStr
+
+    from investedge.ai import tutor
+    from investedge.config import settings
+
+    monkeypatch.setattr(settings, "anthropic_api_key", SecretStr("sk-ant-test"))
+
+    async def no_cache(*a, **k):
+        return None
+
+    async def boom(*a, **k):
+        req = httpx2.Request("POST", "https://api.anthropic.com/v1/messages")
+        raise anthropic.BadRequestError(
+            "credit balance is too low", response=httpx2.Response(400, request=req), body=None
+        )
+
+    monkeypatch.setattr(tutor, "cached_summary", no_cache)
+    monkeypatch.setattr(tutor, "summarize", boom)
+    r = client.get("/api/stocks/AAA/summary?profile=moderate")
+    assert r.status_code == 503
+    assert "unavailable" in r.json()["detail"]
