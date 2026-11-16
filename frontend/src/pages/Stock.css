@@ -1,0 +1,256 @@
+.stock-head {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: var(--s-5);
+  padding: var(--s-6) 0 var(--s-4);
+  border-bottom: var(--hairline-strong);
+}
+.stock-ticker {
+  font-size: var(--step-4);
+  font-weight: 620;
+  font-variation-settings: "opsz" 144, "SOFT" 30, "WONK" 1;
+  letter-spacing: -0.045em;
+  line-height: 0.85;
+}
+.stock-name {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: var(--step-1);
+  color: var(--ink-soft);
+  margin-top: var(--s-2);
+}
+.stock-price {
+  display: grid;
+  justify-items: end;
+  gap: 6px;
+  text-align: right;
+}
+.stock-last {
+  font-size: var(--step-3);
+  line-height: 1;
+}
+.stock-risk-line {
+  font-size: 0.8rem;
+  max-width: 34ch;
+}
+
+.stock-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(300px, 380px);
+  gap: var(--s-6);
+  padding-top: var(--s-4);
+}
+.is-guided .stock-grid {
+  grid-template-columns: 1fr;
+}
+.is-guided .stock-side {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--s-7);
+  align-items: start;
+  border-top: var(--hairline-strong);
+  padding-top: var(--s-6);
+  margin-top: var(--s-5);
+}
+.is-terminal .stock-side {
+  display: grid;
+  gap: var(--s-4);
+  align-content: start;
+  border-left: var(--hairline);
+  padding-left: var(--s-4);
+}
+
+.instruments {
+  display: grid;
+  gap: var(--s-3);
+  margin-bottom: var(--s-3);
+}
+.instrument-row {
+  display: flex;
+  gap: var(--s-3);
+  align-items: center;
+  flex-wrap: wrap;
+}
+.segmented button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.ohlc {
+  margin-left: auto;
+  font-size: 0.75rem;
+  color: var(--ink-soft);
+  white-space: nowrap;
+}
+.model-chips {
+  display: flex;
+  gap: var(--s-2);
+  align-items: center;
+  flex-wrap: wrap;
+}
+.chip {
+  display: inline-flex;
+  border: var(--hairline-strong);
+  border-radius: var(--radius-1);
+  overflow: hidden;
+  font-family: var(--font-mono);
+  font-size: 0.75rem;
+}
+.chip button {
+  border: 0;
+  background: transparent;
+  padding: 0.35em 0.6em;
+  cursor: pointer;
+  color: var(--muted);
+}
+.chip.on button:first-child {
+  color: var(--ink);
+}
+.chip .chip-focus {
+  border-left: var(--hairline);
+  padding: 0.35em 0.45em;
+}
+.chip.focus {
+  border-color: var(--forecast);
+}
+.chip.focus .chip-focus {
+  background: var(--forecast);
+  color: var(--paper);
+}
+
+.chart-skeleton {
+  height: clamp(320px, 52vh, 560px);
+}
+.chart-caption {
+  margin-top: var(--s-3);
+  max-width: 78ch;
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+
+.rewind {
+  margin-top: var(--s-5);
+  padding: var(--s-4) var(--s-4) var(--s-3);
+  border: var(--hairline-strong);
+  background: var(--surface);
+  display: grid;
+  gap: var(--s-3);
+}
+.rewind-head {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--s-4);
+  align-items: start;
+  flex-wrap: wrap;
+}
+.rewind-help {
+  font-size: var(--step--1);
+  max-width: 60ch;
+  margin-top: 4px;
+}
+.rewind-actions {
+  display: flex;
+  gap: var(--s-2);
+}
+
+/* the tally card flips into view after reality has been drawn */
+.tally {
+  perspective: 900px;
+  min-height: 0;
+  margin-top: var(--s-4);
+}
+.tally.show .tally-face {
+  animation: flip-in var(--t-slow) var(--ease-out) both;
+}
+@keyframes flip-in {
+  from {
+    transform: rotateX(-80deg);
+    opacity: 0;
+  }
+  to {
+    transform: none;
+    opacity: 1;
+  }
+}
+.tally-face {
+  transform-origin: top center;
+  border: 1px solid var(--ink);
+  background: var(--surface);
+  padding: var(--s-4) var(--s-5);
+  box-shadow: var(--lift);
+  display: grid;
+  gap: var(--s-2);
+}
+.tally-line {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  line-height: 1.2;
+}
+.tally-checks {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 4px;
+  font-size: var(--step--1);
+}
+.tally-totals {
+  margin-top: var(--s-3);
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+
+.too-new {
+  border: var(--hairline-strong);
+  padding: var(--s-4);
+  margin-bottom: var(--s-3);
+  background: var(--surface);
+}
+
+.stock-section {
+  margin-top: var(--section-gap);
+  display: grid;
+  gap: var(--s-4);
+}
+.ai-slot {
+  border-top: var(--hairline);
+  padding-top: var(--s-4);
+}
+.stock-missing {
+  padding: var(--s-8) 0;
+  display: grid;
+  gap: var(--s-3);
+}
+
+@media (max-width: 1000px) {
+  .stock-grid,
+  .is-terminal .stock-grid {
+    grid-template-columns: 1fr;
+  }
+  .is-terminal .stock-side {
+    border-left: 0;
+    padding-left: 0;
+  }
+  .is-guided .stock-side {
+    grid-template-columns: 1fr;
+    gap: var(--s-5);
+  }
+}
+@media (max-width: 640px) {
+  .stock-head {
+    grid-template-columns: 1fr;
+  }
+  .stock-price {
+    justify-items: start;
+    text-align: left;
+  }
+  .ohlc {
+    margin-left: 0;
+    white-space: normal;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tally.show .tally-face {
+    animation: none;
+  }
+}

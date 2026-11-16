@@ -50,17 +50,19 @@ Timeline target: a few weeks, solo. Phases 1–5 are v1-critical; Phase 6 can sl
 ## Phase 4 — UI design & build (with `original-ui`)
 **Goal:** a distinctive, beginner-friendly interface for the core flow.
 **Demo:** pick a risk profile → screener → stock page with candles/line, model toggles, bands, scorecard, metrics.
-- [ ] 4.1 Run `original-ui`: discovery questions, research, 2–3 concept directions → user picks one
-- [ ] 4.2 Choose frontend framework + charting library; log decision
-- [ ] 4.3 Risk-profile picker + 3-question quiz (persist in localStorage)
-- [ ] 4.4 Home / screener with fit badges, sector browse, search
-- [ ] 4.5 Stock page: candlestick/line toggle, ranges, volume, hover OHLC, model toggles + bands, GARCH cone
-- [ ] 4.6 Scorecard panel with plain-English verdict; model explainers
-- [ ] 4.7 Profile-dependent forecast view; example portfolios page; disclaimers
-- [ ] 4.8 Responsive + accessibility pass
+- [x] 4.1 Run `original-ui`: discovery questions, research, 2–3 concept directions → user picks one
+- [x] 4.2 Choose frontend framework + charting library; log decision
+- [x] 4.3 Risk-profile picker + 3-question quiz (persist in localStorage)
+- [x] 4.4 Home / screener with fit badges, sector browse, search
+- [x] 4.5 Stock page: candlestick/line toggle, ranges, volume, hover OHLC, model toggles + bands, GARCH cone
+- [x] 4.6 Scorecard panel with plain-English verdict; model explainers
+- [x] 4.7 Profile-dependent forecast view; example portfolios page; disclaimers
+- [x] 4.8 Responsive + accessibility pass
+- [x] 4.9 Rewind & Release: `/api/stocks/{s}/backtest` + scrubber, trail release, reality draw, tally card (pulled from Phase 6, D35)
+- [x] 4.10 Guided ↔ Terminal density toggle
 **Done when:**
-- [ ] Full core flow works in the browser against real API data
-- [ ] Stock page < 2s; works at phone width
+- [x] Full core flow works in the browser against real API data
+- [x] Stock page < 2s; works at phone width
 
 ## Phase 5 — AI layer: summaries + grounded chat
 **Goal:** the AI tutor.
@@ -78,7 +80,7 @@ Timeline target: a few weeks, solo. Phases 1–5 are v1-critical; Phase 6 can sl
 ## Phase 6 — Learning extras (can slip)
 **Goal:** Time Machine, candlestick patterns, glossary.
 **Demo:** rewind MSFT to a date a year ago and watch predictions vs. reality; click a labelled "hammer" candle to learn it.
-- [ ] 6.1 Time Machine API (forecast-as-of-date from backtest store) + UI scrubber with reveal
+- [x] 6.1 ~~Time Machine~~ → moved to Phase 4 as "Rewind & Release" (D35)
 - [ ] 6.2 Candlestick pattern detection (≥5 patterns) + chart markers + learn cards
 - [ ] 6.3 Glossary data + tooltips on every metric/term
 **Done when:**

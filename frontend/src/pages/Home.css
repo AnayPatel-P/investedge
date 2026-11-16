@@ -1,0 +1,193 @@
+.home-head {
+  padding: var(--s-7) 0 var(--s-5);
+  display: grid;
+  gap: var(--s-3);
+  border-bottom: var(--hairline-strong);
+}
+.home-title {
+  font-size: var(--step-4);
+  font-weight: 460;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+}
+.home-lede {
+  max-width: 60ch;
+  color: var(--ink-soft);
+  font-size: var(--step-1);
+}
+.filters {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: var(--s-4);
+  margin-top: var(--s-2);
+}
+.filters label {
+  display: grid;
+  gap: 2px;
+}
+.filters select {
+  font: inherit;
+  font-size: var(--step--1);
+  padding: 0.4em 0.6em;
+  border: var(--hairline-strong);
+  border-radius: var(--radius-1);
+  background: var(--surface);
+  color: var(--ink);
+}
+
+/* Guided: ledger rows like an almanac table of contents */
+.ledger {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.ledger-row {
+  display: grid;
+  grid-template-columns: 2.5rem minmax(14rem, 1.3fr) minmax(11rem, auto) 1.4fr 7rem;
+  align-items: center;
+  gap: var(--s-4);
+  padding: var(--row-pad) 0;
+  border-bottom: var(--hairline);
+}
+.ledger-rank {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+.ledger-main {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  grid-template-areas: "sym name" "sym sector";
+  column-gap: var(--s-3);
+  text-decoration: none;
+  align-items: baseline;
+}
+.ledger-main:hover .ledger-sym {
+  color: var(--forecast-text);
+}
+.ledger-sym {
+  grid-area: sym;
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  min-width: 3.4em;
+  transition: color var(--t-fast);
+}
+.ledger-name {
+  grid-area: name;
+  font-weight: 500;
+}
+.ledger-sector {
+  grid-area: sector;
+  font-size: 0.8rem;
+}
+.ledger-meta {
+  display: grid;
+  gap: 6px;
+}
+.ledger-sentence {
+  font-size: var(--step--1);
+  color: var(--ink-soft);
+}
+.ledger-return {
+  text-align: right;
+  font-size: 0.9rem;
+}
+.more {
+  margin: var(--s-5) auto 0;
+  display: flex;
+}
+
+/* Terminal: dense sortable table */
+.term-head {
+  padding: var(--s-4) 0 var(--s-3);
+  grid-template-columns: 1fr auto;
+  align-items: end;
+}
+.term-title {
+  font-size: var(--step-2);
+}
+.term-table-wrap {
+  overflow-x: auto;
+}
+.term-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+.term-table th {
+  text-align: left;
+  border-bottom: var(--hairline-strong);
+  position: sticky;
+  top: 0;
+  background: var(--paper);
+  white-space: nowrap;
+}
+.term-table th button {
+  border: 0;
+  background: none;
+  padding: 6px 8px;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+}
+.term-table th:not(:has(button)) {
+  padding: 6px 8px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  font-weight: 400;
+}
+.term-table td {
+  padding: 4px 8px;
+  border-bottom: 1px solid var(--rule);
+  white-space: nowrap;
+}
+.term-table tbody tr:hover {
+  background: var(--surface);
+}
+.term-table .num-cell {
+  text-align: right;
+}
+.term-name {
+  max-width: 22ch;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (max-width: 960px) {
+  .ledger-row {
+    grid-template-columns: 2rem 1fr auto;
+    grid-template-areas: "rank main ret" "rank meta meta" "rank sent sent";
+    row-gap: var(--s-2);
+  }
+  .ledger-rank {
+    grid-area: rank;
+    align-self: start;
+    padding-top: 0.6em;
+  }
+  .ledger-main {
+    grid-area: main;
+  }
+  .ledger-meta {
+    grid-area: meta;
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--s-3);
+  }
+  .ledger-sentence {
+    grid-area: sent;
+  }
+  .ledger-return {
+    grid-area: ret;
+  }
+  .term-head {
+    grid-template-columns: 1fr;
+  }
+}

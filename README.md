@@ -7,16 +7,17 @@ Educational web app that helps new investors understand any S&P 500 stock throug
 Planning docs: [`docs/pm/`](docs/pm/) — PRD, roadmap, decisions, status.
 
 ## Status
-Phase 3 (backtest scorecard, risk metrics, profiles, example portfolios) complete. See [`docs/pm/STATUS.md`](docs/pm/STATUS.md).
+Phase 4 (the web app) complete: profile picker, screener, stock pages with **Rewind & Release**, example portfolios. See [`docs/pm/STATUS.md`](docs/pm/STATUS.md).
 
 ## Run locally
-Requires [uv](https://docs.astral.sh/uv/) (it installs Python 3.12 for you).
+Requires [uv](https://docs.astral.sh/uv/) (it installs Python 3.12 for you) and Node 20+.
 
 ```bash
-make install     # backend deps
+make install     # backend (uv) + frontend (npm) deps
 make refresh     # all 503 tickers: prices, forecasts, risk metrics; weekly backtest (~1 min, ~8 with backtest)
-make dev         # API + skeleton page at http://localhost:8000
-make test        # unit tests
+make dev         # API on :8000 + web app at http://localhost:5173
+make test        # backend + frontend tests
+make build       # production build of the web app
 make spike       # time every model; extrapolates to all 503 tickers
 ```
 
@@ -33,9 +34,20 @@ backend/src/investedge/
   storage.py       DuckDB store (batch writes, API reads)
   api.py           FastAPI read-only API
   cli.py           `investedge` CLI
-frontend/skeleton/ throwaway Phase 1 page (real UI comes in Phase 4)
+frontend/src/
+  pages/           Home (profile picker + screener), Stock, Portfolios
+  chart/           FuturesChart (Lightweight Charts + canvas overlay), trails, tally, Scrubber
+  components/      Dial, Masthead/Search, ScorecardPanel, MetricsLedger, badges
+  styles/tokens.css  design tokens: Guided (almanac paper) and Terminal (night almanac)
 data/              local DuckDB file (git-ignored)
 ```
+
+## Design
+"Almanac of Possible Futures": warm almanac paper, Fraunces + IBM Plex, and one signature moment.
+**Rewind & Release**: drag the timeline back to a past date, watch hundreds of possible futures fan out
+from what a model knew then, and see the real price draw itself through them. A tally card says whether
+reality landed inside the range and whether the model beat the naive guess. Toggle **Guided ↔ Terminal**
+for an editorial or a dense view.
 
 ## API (read-only)
 | Endpoint | What it returns |
@@ -47,6 +59,7 @@ data/              local DuckDB file (git-ignored)
 | `GET /api/stocks/{s}/forecasts` | 30-day forecasts with 80/95% bands per model |
 | `GET /api/stocks/{s}/metrics` | Risk metrics, risk score/level, profile fit |
 | `GET /api/stocks/{s}/scorecard` | Backtest accuracy vs. naive baseline + verdict |
+| `GET /api/stocks/{s}/backtest` | Past forecasts at each replay date vs. what happened |
 | `GET /api/screener?profile=` | Stocks ranked by fit for a profile |
 | `GET /api/example-portfolios?profile=` | Rule-based example basket + diversification lesson |
 | `GET /api/runs/latest` | Latest pipeline run report |

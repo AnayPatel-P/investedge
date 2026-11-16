@@ -144,6 +144,13 @@ Every new investor should be able to open any S&P 500 stock and understand it: w
 - **Deploy:** backend on Render/Fly.io, frontend on Vercel/Netlify (decided in Ship phase).
 - Detailed reasons in `DECISIONS.md`.
 
+## 9b. Design
+**Concept:** "Almanac of Possible Futures" with an Instrument-Bench confidence dial (D33).
+- **Signature moment — Rewind & Release (D34):** scrub back to a past date; hundreds of possible-future trails sampled from each model's forecast range fan out; the real price draws through them in ink; a tally card says whether reality stayed inside the range and whether the model beat the naive guess.
+- **Confidence dial:** a detented control (50 / 80 / 95%) that widens the bands, captioned "wider range = more honest, less precise".
+- **Density toggle (D36):** Guided (editorial, captions) ↔ Terminal (dense night almanac).
+- **Visual language:** warm paper `#F4EDE1`, ink `#1F2A30`, ochre `#C98A2E`, teal `#2E6E72` (up/reality), rust `#B4472F` (down); Fraunces + IBM Plex Sans/Mono; hollow vs. filled candles and ▲/▼ glyphs so color is never the only signal.
+
 ## 10. Success metrics
 | Metric | Target | How measured |
 |--------|--------|--------------|

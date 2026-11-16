@@ -1,0 +1,146 @@
+.pf-head {
+  padding: var(--s-7) 0 var(--s-5);
+  display: grid;
+  gap: var(--s-3);
+  border-bottom: var(--hairline-strong);
+}
+.pf-title {
+  font-size: var(--step-4);
+  font-weight: 460;
+  letter-spacing: -0.035em;
+  line-height: 0.95;
+  max-width: 16ch;
+}
+.pf-lede {
+  max-width: 58ch;
+  font-size: var(--step-1);
+  color: var(--ink-soft);
+}
+.pf-disclaimer {
+  margin: var(--s-5) 0;
+  padding: var(--s-3) var(--s-4);
+  border-left: 3px solid var(--down);
+  background: var(--surface);
+  font-size: var(--step--1);
+}
+.pf-swing {
+  display: grid;
+  gap: var(--s-4);
+  padding: var(--s-5) 0;
+}
+.swingbar {
+  display: grid;
+  grid-template-columns: minmax(12rem, 22rem) 1fr 9rem;
+  gap: var(--s-4);
+  align-items: center;
+}
+.swingbar-label {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+}
+.swingbar-track {
+  height: 28px;
+  border-bottom: var(--hairline-strong);
+  position: relative;
+}
+.swingbar-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: var(--w);
+  animation: grow var(--t-slow) var(--ease-out) both;
+}
+.single .swingbar-fill {
+  background: repeating-linear-gradient(90deg, var(--ink-soft) 0 2px, transparent 2px 5px);
+}
+.basket .swingbar-fill {
+  background: var(--forecast);
+  animation-delay: 250ms;
+}
+@keyframes grow {
+  from {
+    width: 0;
+  }
+}
+.swingbar-value {
+  font-size: var(--step-1);
+  text-align: right;
+}
+.pf-lesson {
+  font-size: var(--step-1);
+  max-width: 64ch;
+  line-height: 1.5;
+}
+.pf-holdings {
+  border-top: var(--hairline-strong);
+  padding-top: var(--s-5);
+  display: grid;
+  gap: var(--s-4);
+}
+.pf-rule {
+  max-width: 70ch;
+  font-size: var(--step--1);
+  margin-top: var(--s-2);
+}
+.pf-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  columns: 2 360px;
+  column-gap: var(--s-6);
+}
+.pf-list li {
+  break-inside: avoid;
+  display: grid;
+  grid-template-columns: 4.2rem 1fr auto auto;
+  gap: var(--s-3);
+  align-items: baseline;
+  padding: var(--row-pad) 0;
+  border-bottom: var(--hairline);
+}
+.pf-sym {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  font-weight: 600;
+  text-decoration: none;
+}
+.pf-name {
+  display: grid;
+  font-size: var(--step--1);
+}
+.pf-name .muted {
+  font-size: 0.75rem;
+}
+.pf-weight {
+  font-size: 0.85rem;
+}
+.pf-stats {
+  display: flex;
+  gap: var(--s-6);
+  margin: 0;
+}
+.pf-stats dd {
+  margin: 0;
+  font-size: var(--step-1);
+}
+@media (max-width: 720px) {
+  .swingbar {
+    grid-template-columns: 1fr auto;
+    grid-template-areas: "label value" "track track";
+  }
+  .swingbar-label {
+    grid-area: label;
+  }
+  .swingbar-track {
+    grid-area: track;
+  }
+  .swingbar-value {
+    grid-area: value;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .swingbar-fill {
+    animation: none;
+  }
+}

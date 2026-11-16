@@ -4,14 +4,11 @@ import json
 
 import pandas as pd
 from fastapi import FastAPI, HTTPException, Query
-from fastapi.responses import FileResponse
 
 from investedge import backtest, risk, storage
-from investedge.config import PROJECT_ROOT, settings
+from investedge.config import settings
 
 app = FastAPI(title="InvestEdge API", version="0.1.0")
-
-SKELETON_PAGE = PROJECT_ROOT / "frontend" / "skeleton" / "index.html"
 
 
 def _rows(sql: str, params: list) -> list[dict]:
@@ -147,6 +144,23 @@ def stock_scorecard(symbol: str) -> dict:
     }
 
 
+@app.get("/api/stocks/{symbol}/backtest")
+def stock_backtest(symbol: str) -> dict:
+    """Past forecasts at each rolling origin vs. what actually happened ("Rewind & Release").
+    Shape: {origins: [date], runs: {origin: {model: [{step, date, actual, mean, lo_80, ...}]}}}"""
+    sym = symbol.upper()
+    rows = _rows(
+        "SELECT origin, model, step, date, actual, mean, lo_80, hi_80, lo_95, hi_95 "
+        "FROM backtest_forecasts WHERE symbol = ? ORDER BY origin, model, step",
+        [sym],
+    )
+    runs: dict[str, dict[str, list[dict]]] = {}
+    for r in rows:
+        origin = str(r.pop("origin"))
+        runs.setdefault(origin, {}).setdefault(r.pop("model"), []).append(r)
+    return {"symbol": sym, "origins": sorted(runs), "runs": runs}
+
+
 @app.get("/api/screener")
 def screen(
     profile: str, sector: str | None = None, fit: str | None = None, limit: int = 50
@@ -205,9 +219,3 @@ def example_portfolio(profile: str) -> dict:
         "stats": stats,
         "lesson": risk.portfolio_lesson(p.key, stats),
     }
-
-
-@app.get("/", include_in_schema=False)
-def skeleton_page() -> FileResponse:
-    """Throwaway Phase 1 page; replaced by the real frontend in Phase 4."""
-    return FileResponse(SKELETON_PAGE)

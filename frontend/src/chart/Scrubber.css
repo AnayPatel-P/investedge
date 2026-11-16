@@ -1,0 +1,80 @@
+.scrubber {
+  display: grid;
+  gap: var(--s-2);
+  user-select: none;
+}
+.scrubber.disabled {
+  opacity: 0.5;
+}
+.scrubber-track {
+  position: relative;
+  height: 44px;
+  cursor: pointer;
+  touch-action: none;
+}
+.scrubber-line {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--rule-strong);
+}
+.scrubber-past {
+  position: absolute;
+  left: 0;
+  top: calc(50% - 1px);
+  height: 3px;
+  background: var(--forecast);
+  transition: width var(--t-mid) var(--ease-detent);
+}
+.scrubber-notch {
+  position: absolute;
+  top: calc(50% - 8px);
+  width: 1px;
+  height: 16px;
+  background: var(--ink);
+}
+.scrubber-notch.today {
+  width: 3px;
+  margin-left: -1px;
+  height: 22px;
+  top: calc(50% - 11px);
+}
+.scrubber-thumb {
+  position: absolute;
+  top: 50%;
+  width: 22px;
+  height: 22px;
+  margin: -11px 0 0 -11px;
+  border-radius: 50%;
+  background: var(--surface);
+  border: 2px solid var(--ink);
+  box-shadow: 0 6px 14px -6px rgba(31, 42, 48, 0.5);
+  transition: left var(--t-mid) var(--ease-detent);
+}
+.scrubber-thumb::after {
+  content: "";
+  position: absolute;
+  inset: 5px;
+  border-radius: 50%;
+  background: var(--forecast);
+}
+.scrubber-thumb.dragging {
+  transition: none;
+  transform: scale(1.12);
+}
+.scrubber-track:focus-visible .scrubber-thumb {
+  outline: 2px solid var(--focus);
+  outline-offset: 3px;
+}
+.scrubber-scale {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+.scrubber-scale span:nth-child(2) {
+  color: var(--ink);
+  font-weight: 600;
+}

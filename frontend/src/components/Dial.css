@@ -1,0 +1,100 @@
+.dial {
+  display: grid;
+  grid-template-columns: var(--dial-size) 1fr;
+  grid-template-areas: "face readout" "labels readout";
+  gap: var(--s-2) var(--s-5);
+  align-items: center;
+}
+.dial-face {
+  grid-area: face;
+  position: relative;
+  width: var(--dial-size);
+  height: var(--dial-size);
+}
+.dial-ticks {
+  position: absolute;
+  inset: 0;
+}
+.dial-ticks line {
+  stroke: var(--rule-strong);
+  stroke-width: 1.2;
+}
+.dial-ticks line.major {
+  stroke: var(--ink);
+  stroke-width: 2;
+}
+.dial-knob {
+  position: absolute;
+  inset: 18%;
+  border-radius: 50%;
+  cursor: grab;
+  touch-action: none;
+  /* machined knob: layered radial highlights over the surface color */
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.55), transparent 45%),
+    repeating-conic-gradient(from 0deg, rgba(31, 42, 48, 0.05) 0deg 2deg, transparent 2deg 4deg),
+    var(--surface);
+  border: 1px solid var(--rule-strong);
+  box-shadow:
+    inset 0 -3px 6px rgba(31, 42, 48, 0.12),
+    0 2px 0 var(--rule),
+    0 10px 20px -10px rgba(31, 42, 48, 0.45);
+  transition: transform var(--t-mid) var(--ease-detent);
+}
+.dial-knob.dragging {
+  cursor: grabbing;
+  transition: none;
+}
+.dial-pointer {
+  position: absolute;
+  left: 50%;
+  top: 8%;
+  width: 4px;
+  height: 26%;
+  margin-left: -2px;
+  border-radius: 2px;
+  background: var(--forecast);
+}
+.dial-labels {
+  grid-area: labels;
+  display: flex;
+  justify-content: space-between;
+  width: var(--dial-size);
+}
+.dial-labels button {
+  border: 0;
+  background: none;
+  padding: 2px 4px;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+.dial-labels button[aria-pressed="true"] {
+  color: var(--ink);
+  text-decoration: underline;
+  text-decoration-color: var(--forecast);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+.dial-readout {
+  grid-area: readout;
+  display: flex;
+  flex-direction: column;
+  gap: var(--s-1);
+  max-width: 28ch;
+}
+.dial-value {
+  font-family: var(--font-display);
+  font-size: var(--step-2);
+  line-height: 1.1;
+}
+.dial-caption {
+  font-size: var(--step--1);
+}
+:root[data-density="terminal"] .dial-knob {
+  background:
+    radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.12), transparent 45%),
+    repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.04) 0deg 2deg, transparent 2deg 4deg),
+    var(--surface);
+}

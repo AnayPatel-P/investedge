@@ -1,0 +1,48 @@
+.fit {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  white-space: nowrap;
+}
+.fit-good {
+  color: var(--good);
+}
+.fit-possible {
+  color: var(--possible);
+}
+.fit-outside {
+  color: var(--outside);
+}
+
+.riskmeter {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--s-2);
+}
+.riskmeter-track {
+  position: relative;
+  width: 96px;
+  height: 6px;
+  border: var(--hairline-strong);
+  border-radius: 1px;
+  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--down) 18%, transparent));
+}
+.riskmeter-tick {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 1px;
+  background: var(--rule-strong);
+}
+.riskmeter-mark {
+  position: absolute;
+  top: -5px;
+  width: 3px;
+  height: 14px;
+  margin-left: -1.5px;
+  background: var(--ink);
+}
+.riskmeter-label {
+  font-size: 0.75rem;
+  color: var(--muted);
+  min-width: 6.5em;
+}

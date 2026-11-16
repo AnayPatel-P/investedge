@@ -1,0 +1,111 @@
+/* InvestEdge design tokens — "Almanac of Possible Futures" (DECISIONS D33).
+   Guided = warm almanac paper; Terminal = dense night almanac. */
+
+:root {
+  /* palette — paper */
+  --paper: #f4ede1;
+  --paper-deep: #ebe2d2;
+  --surface: #fbf7ef;
+  --ink: #1f2a30;
+  --ink-soft: #3b474d;
+  --muted: #5e6a70; /* 4.8:1 on paper */
+  --rule: #cfc4b1;
+  --rule-strong: #a99c86;
+
+  /* semantic */
+  --forecast: #c98a2e; /* ochre: model futures (graphics only) */
+  --forecast-text: #8a5a12; /* ochre for text, 5.1:1 */
+  --reality: #1f2a30; /* the real price is drawn in ink */
+  --up: #2e6e72; /* sea teal, 4.9:1 */
+  --down: #b4472f; /* rust, 4.8:1 */
+  --good: #2e6e72;
+  --possible: #8a5a12;
+  --outside: #b4472f;
+  --focus: #2e6e72;
+  --trail-alpha: 0.07;
+
+  /* type */
+  --font-display: "Fraunces Variable", "Iowan Old Style", Georgia, serif;
+  --font-body: "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: "IBM Plex Mono", ui-monospace, "SF Mono", Menlo, monospace;
+
+  --step--1: clamp(0.8rem, 0.78rem + 0.1vw, 0.86rem);
+  --step-0: clamp(0.95rem, 0.92rem + 0.15vw, 1.05rem);
+  --step-1: clamp(1.15rem, 1.08rem + 0.35vw, 1.35rem);
+  --step-2: clamp(1.45rem, 1.3rem + 0.7vw, 1.9rem);
+  --step-3: clamp(2rem, 1.6rem + 1.8vw, 3.2rem);
+  --step-4: clamp(3rem, 2rem + 5vw, 6.5rem); /* giant ticker numerals */
+
+  /* space */
+  --s-1: 0.25rem;
+  --s-2: 0.5rem;
+  --s-3: 0.75rem;
+  --s-4: 1rem;
+  --s-5: 1.5rem;
+  --s-6: 2rem;
+  --s-7: 3rem;
+  --s-8: 4.5rem;
+  --gutter: clamp(16px, 4vw, 48px);
+  --measure: 68ch;
+
+  /* shape — almanacs use rules, not cards */
+  --radius-0: 0;
+  --radius-1: 3px;
+  --radius-pill: 999px;
+  --hairline: 1px solid var(--rule);
+  --hairline-strong: 1px solid var(--rule-strong);
+  --lift: 0 1px 0 rgba(31, 42, 48, 0.06), 0 8px 24px -12px rgba(31, 42, 48, 0.25);
+
+  /* motion — slow, eased, calm */
+  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-detent: cubic-bezier(0.34, 1.56, 0.64, 1); /* small overshoot for the dial's click */
+  --t-fast: 160ms;
+  --t-mid: 320ms;
+  --t-slow: 900ms;
+
+  /* density (guided) */
+  --row-pad: var(--s-4);
+  --section-gap: var(--s-8);
+
+  color-scheme: light;
+}
+
+:root[data-density="terminal"] {
+  --paper: #141a1d;
+  --paper-deep: #101518;
+  --surface: #1b2327;
+  --ink: #ece5d6;
+  --ink-soft: #c9c2b4;
+  --muted: #9aa6ab;
+  --rule: #2c373c;
+  --rule-strong: #43525a;
+  --forecast: #e0a54a;
+  --forecast-text: #e8b665;
+  --reality: #ece5d6;
+  --up: #6cc0bd;
+  --down: #ec8a70;
+  --good: #6cc0bd;
+  --possible: #e8b665;
+  --outside: #ec8a70;
+  --focus: #e8b665;
+  --trail-alpha: 0.09;
+
+  --step-0: 0.9rem;
+  --step-1: 1rem;
+  --step-2: 1.25rem;
+  --step-3: 1.7rem;
+  --step-4: 2.6rem;
+  --row-pad: var(--s-2);
+  --section-gap: var(--s-5);
+  --lift: none;
+
+  color-scheme: dark;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --t-fast: 0ms;
+    --t-mid: 0ms;
+    --t-slow: 0ms;
+  }
+}
