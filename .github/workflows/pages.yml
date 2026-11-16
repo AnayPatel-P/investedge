@@ -1,0 +1,107 @@
+name: Nightly refresh + deploy to GitHub Pages
+
+on:
+  schedule:
+    # 22:30 UTC on weekdays = after the US close (+ buffer for final prices) in both EST and EDT.
+    - cron: "30 22 * * 1-5"
+  workflow_dispatch:
+    inputs:
+      backtest:
+        description: "Re-run the weekly backtest now"
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 150
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v5
+        with:
+          enable-cache: true
+          cache-dependency-glob: backend/uv.lock
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      # The DuckDB store carries over between runs, so each night only fetches new days and
+      # the backtest only re-runs weekly.
+      - name: Restore data store
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            data/investedge.duckdb
+            data/reports
+          key: investedge-data-${{ github.run_id }}
+          restore-keys: investedge-data-
+
+      - name: Install backend
+        working-directory: backend
+        run: uv sync --frozen
+
+      - name: Refresh prices, forecasts, metrics (+ weekly backtest)
+        working-directory: backend
+        run: |
+          FLAGS=""
+          if [ "${{ inputs.backtest }}" = "true" ]; then FLAGS="--backtest"; fi
+          status=0
+          uv run investedge refresh $FLAGS > refresh.log 2>&1 || status=$?
+          grep -v '^INFO' refresh.log | tail -25
+          if [ "$status" -eq 0 ]; then
+            echo "refresh ok"
+          elif [ -f ../data/investedge.duckdb ]; then
+            echo "::warning::Refresh failed; deploying the last good data instead."
+          else
+            echo "::error::Refresh failed and there is no previous data to deploy."
+            exit 1
+          fi
+
+      - name: Save data store
+        if: always()
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            data/investedge.duckdb
+            data/reports
+          key: investedge-data-${{ github.run_id }}
+
+      - name: Export static JSON API
+        working-directory: backend
+        run: uv run investedge export --out ../frontend/public/data
+
+      - name: Build site
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build:pages
+
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: frontend/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -9,12 +9,14 @@ import type {
   Patterns,
   PriceBar,
   Profile,
+  RunReport,
   ProfileKey,
   Scorecard,
   Screener,
   Summary,
   Ticker,
 } from "./types";
+import { STATIC, searchTickers, staticUrl } from "./static";
 
 export class ApiError extends Error {
   constructor(
@@ -26,7 +28,13 @@ export class ApiError extends Error {
 }
 
 async function get<T>(path: string): Promise<T> {
-  const res = await fetch(`/api${path}`);
+  let url = `/api${path}`;
+  if (STATIC) {
+    const file = staticUrl(path);
+    if (!file) throw new ApiError(404, "Not available in the static site");
+    url = file;
+  }
+  const res = await fetch(url);
   if (!res.ok) {
     let detail = res.statusText;
     try {
@@ -51,7 +59,8 @@ export const useTickers = () => useQuery({ queryKey: ["tickers"], queryFn: () =>
 export const useSearch = (q: string) =>
   useQuery({
     queryKey: ["search", q],
-    queryFn: () => get<Ticker[]>(`/search?q=${encodeURIComponent(q)}&limit=8`),
+    queryFn: async () =>
+      STATIC ? searchTickers(await get<Ticker[]>("/tickers"), q) : get<Ticker[]>(`/search?q=${encodeURIComponent(q)}&limit=8`),
     enabled: q.trim().length > 0,
     ...opts,
   });
@@ -67,12 +76,20 @@ export const useScorecard = (s: string) => useQuery({ queryKey: ["scorecard", s]
 export const useScreener = (profile: ProfileKey, sector?: string) =>
   useQuery({
     queryKey: ["screener", profile, sector],
-    queryFn: () => get<Screener>(`/screener?profile=${profile}&limit=503${sector ? `&sector=${encodeURIComponent(sector)}` : ""}`),
+    queryFn: async () => {
+      const data = await get<Screener>(`/screener?profile=${profile}&limit=503${sector ? `&sector=${encodeURIComponent(sector)}` : ""}`);
+      if (!STATIC || !sector) return data;
+      // The static file holds the full ranked list; filter the sector in the browser.
+      const results = data.results.filter((r) => r.sector.toLowerCase() === sector.toLowerCase());
+      return { ...data, total: results.length, results };
+    },
     ...opts,
   });
 
 export const usePortfolio = (profile: ProfileKey) =>
   useQuery({ queryKey: ["portfolio", profile], queryFn: () => get<ExamplePortfolio>(`/example-portfolios?profile=${profile}`), ...opts });
+
+export const useLatestRun = () => useQuery({ queryKey: ["run"], queryFn: () => get<RunReport>("/runs/latest"), ...opts, retry: false });
 
 export const useAiStatus = () => useQuery({ queryKey: ["ai-status"], queryFn: () => get<AiStatus>("/ai/status"), ...opts });
 

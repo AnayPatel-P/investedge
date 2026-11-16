@@ -140,7 +140,15 @@ export interface ExamplePortfolio {
 
 export interface AiStatus {
   configured: boolean;
-  model: string;
+  model: string | null;
+  /** True on the free static site, where there is no server to hold an API key. */
+  static?: boolean;
+}
+export interface RunReport {
+  started: string;
+  finished: string;
+  coverage_pct: number;
+  symbols: number;
 }
 export interface Summary {
   symbol: string;

@@ -1,4 +1,6 @@
 import { Link, NavLink } from "react-router-dom";
+import { useLatestRun } from "../api/client";
+import { longDate } from "../format";
 import { usePrefs } from "../state/prefs";
 import { Search } from "./Search";
 import "./Masthead.css";
@@ -47,6 +49,8 @@ export function Masthead() {
 }
 
 export function Footer() {
+  const run = useLatestRun();
+  const asOf = run.data?.finished?.slice(0, 10);
   return (
     <footer className="site-footer">
       <p>
@@ -54,7 +58,7 @@ export function Footer() {
         models guess might happen. It does not know your situation and never tells you what to buy or sell.
       </p>
       <p className="muted">
-        Prices: daily end-of-day data via Yahoo Finance, refreshed nightly. Charts by{" "}
+        Prices: daily end-of-day data via Yahoo Finance, refreshed nightly{asOf ? ` (last refresh ${longDate(asOf)})` : ""}. Charts by{" "}
         <a href="https://www.tradingview.com/" target="_blank" rel="noreferrer">
           TradingView Lightweight Charts
         </a>

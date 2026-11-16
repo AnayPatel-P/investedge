@@ -41,7 +41,16 @@ export function Tutor({ symbol, profile }: { symbol: string; profile: ProfileKey
           the charts and tables above are the source of truth.
         </p>
       </header>
-      {status.isLoading ? null : !configured ? (
+      {status.isLoading ? null : status.data?.static ? (
+        <p className="tutor-off">
+          The AI tutor runs in the full version of InvestEdge. It needs a server holding an Anthropic API key, so it's switched
+          off on this free demo site.{" "}
+          <a href="https://github.com/AnayPatel-P/investedge#ai-tutor-optional" target="_blank" rel="noreferrer">
+            See how to run it yourself
+          </a>
+          .
+        </p>
+      ) : !configured ? (
         <p className="tutor-off">
           The AI tutor isn't switched on for this copy of InvestEdge — the server needs an Anthropic API key. Everything else on
           the page works without it.

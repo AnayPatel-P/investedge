@@ -32,7 +32,7 @@ createRoot(document.getElementById("root")!).render(
   <StrictMode>
     <QueryClientProvider client={queryClient}>
       <PrefsProvider>
-        <BrowserRouter>
+        <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, "") || undefined}>
           <ScrollToTop />
           <a className="visually-hidden" href="#main">
             Skip to content

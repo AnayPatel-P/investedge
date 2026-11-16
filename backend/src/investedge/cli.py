@@ -95,3 +95,18 @@ def spike(models: str = typer.Option(ALL_MODELS)) -> None:
     typer.echo(summary.round(3).to_string())
     total = summary["est_503_serial_min"].sum()
     typer.echo(f"\nAll models, 503 tickers, single core: ~{total:.1f} min")
+
+
+@app.command("export")
+def export_static(
+    out: str = typer.Option(
+        "../frontend/public/data", help="Output folder for the static JSON API"
+    ),
+) -> None:
+    """Export the read-only API as static JSON (for GitHub Pages)."""
+    from pathlib import Path
+
+    from investedge.export import export
+
+    report = export(Path(out).resolve())
+    typer.echo(report)
