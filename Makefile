@@ -8,7 +8,7 @@ install:  ## Install backend deps (requires uv)
 dev:  ## Run the API + skeleton page at http://localhost:8000
 	$(BACKEND) uv run uvicorn investedge.api:app --reload --port 8000
 
-refresh:  ## Universe + prices + all forecasts (Phase 1: sample tickers)
+refresh:  ## Nightly job: universe + incremental prices + all forecasts + run report (all 503)
 	$(BACKEND) uv run investedge refresh
 
 spike:  ## Time every model on the sample tickers

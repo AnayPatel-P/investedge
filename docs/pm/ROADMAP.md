@@ -24,15 +24,15 @@ Timeline target: a few weeks, solo. Phases 1–5 are v1-critical; Phase 6 can sl
 ## Phase 2 — Full data pipeline + forecasting engine
 **Goal:** all ~503 tickers, all model families, one-command nightly refresh.
 **Demo:** run `make refresh`, see a report: N tickers updated, M models fitted, failures, runtime.
-- [ ] 2.1 Full-universe fetch with incremental updates, retries/backoff, Stooq fallback
-- [ ] 2.2 Model runners: ARIMA/SARIMA, ETS, Prophet (30-day horizon, 80/95% bands); naive baseline
-- [ ] 2.3 GARCH(1,1) volatility forecast → expected-range cone
-- [ ] 2.4 Parallelized batch (multiprocessing) + refit strategy chosen from spike
-- [ ] 2.5 Pipeline run report (coverage, failures, timings) saved per run
-- [ ] 2.6 Unit tests: data cleaning, forecast output shape, band ordering
+- [x] 2.1 Full-universe fetch with incremental updates, retries/backoff, stale-cache fallback (Stooq dropped — D20)
+- [x] 2.2 Model runners: ARIMA/SARIMA, ETS, Prophet (30-day horizon, 80/95% bands); naive baseline
+- [x] 2.3 GARCH(1,1) volatility forecast → expected-range cone
+- [x] 2.4 Parallelized batch (multiprocessing) + refit strategy chosen from spike
+- [x] 2.5 Pipeline run report (coverage, failures, timings) saved per run
+- [x] 2.6 Unit tests: data cleaning, forecast output shape, band ordering
 **Done when:**
-- [ ] ≥98% tickers have data + all forecasts; full run < 60 min locally
-- [ ] Tests pass
+- [x] ≥98% tickers have data + all forecasts; full run < 60 min locally
+- [x] Tests pass
 
 ## Phase 3 — Scorecard, risk metrics & risk-profile logic
 **Goal:** the "honesty" and "personalization" brains, exposed via API.

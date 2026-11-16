@@ -1,10 +1,12 @@
 """Read-only HTTP API over the precomputed DuckDB store."""
 
+import json
+
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import FileResponse
 
 from investedge import storage
-from investedge.config import PROJECT_ROOT
+from investedge.config import PROJECT_ROOT, settings
 
 app = FastAPI(title="InvestEdge API", version="0.1.0")
 
@@ -27,10 +29,23 @@ def health() -> dict:
 
 @app.get("/api/tickers")
 def tickers(with_data: bool = True) -> list[dict]:
-    sql = "SELECT t.symbol, t.name, t.sector FROM tickers t"
-    if with_data:
-        sql += " WHERE EXISTS (SELECT 1 FROM prices p WHERE p.symbol = t.symbol)"
-    return _rows(sql + " ORDER BY t.symbol", [])
+    """Constituents with their last price date; `stale` means the latest session is missing."""
+    join = "JOIN" if with_data else "LEFT JOIN"
+    return _rows(
+        "WITH last AS (SELECT symbol, max(date) AS last_date FROM prices GROUP BY symbol) "
+        "SELECT t.symbol, t.name, t.sector, l.last_date, "
+        "coalesce(l.last_date < (SELECT max(last_date) FROM last), true) AS stale "
+        f"FROM tickers t {join} last l USING (symbol) ORDER BY t.symbol",
+        [],
+    )
+
+
+@app.get("/api/runs/latest")
+def latest_run() -> dict:
+    path = settings.data_dir / "reports" / "latest.json"
+    if not path.exists():
+        raise HTTPException(404, "No pipeline run yet")
+    return json.loads(path.read_text())
 
 
 @app.get("/api/stocks/{symbol}/prices")

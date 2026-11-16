@@ -10,15 +10,15 @@ from investedge.models.forecasters import MODELS
 
 app = typer.Typer(help="InvestEdge data pipeline", no_args_is_help=True)
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(name)s: %(message)s")
+for noisy in ("yfinance", "cmdstanpy", "prophet", "matplotlib"):
+    logging.getLogger(noisy).setLevel(logging.ERROR)
+
+ALL_MODELS = ",".join(MODELS)
+SAMPLE = typer.Option(False, "--sample", help="Only the 20 sample tickers")
 
 
 def _symbols(sample: bool) -> list[str]:
-    if sample:
-        return list(settings.sample_tickers)
-    from investedge import storage
-
-    with storage.connect(read_only=True) as con:
-        return [r[0] for r in con.execute("SELECT symbol FROM tickers ORDER BY symbol").fetchall()]
+    return list(settings.sample_tickers) if sample else pipeline.all_symbols()
 
 
 @app.command()
@@ -28,34 +28,43 @@ def universe() -> None:
 
 
 @app.command()
-def fetch(sample: bool = typer.Option(True, help="Only the Phase 1 sample tickers")) -> None:
-    """Download daily OHLCV history."""
-    n, failed = pipeline.load_prices(_symbols(sample))
-    typer.echo(f"Stored prices for {n} symbols; failed: {failed or 'none'}")
+def fetch(sample: bool = SAMPLE) -> None:
+    """Download new daily OHLCV (incremental; full history for new or re-adjusted symbols)."""
+    r = pipeline.load_prices(_symbols(sample))
+    typer.echo(
+        f"full {len(r.full)}, incremental {len(r.incremental)}, re-adjusted {len(r.readjusted)}, "
+        f"unchanged {len(r.unchanged)}, failed {r.failed or 'none'}"
+    )
 
 
 @app.command()
 def forecast(
-    sample: bool = typer.Option(True, help="Only the Phase 1 sample tickers"),
-    models: str = typer.Option("naive,arima", help="Comma-separated: " + ",".join(MODELS)),
+    sample: bool = SAMPLE,
+    models: str = typer.Option(ALL_MODELS, help="Comma-separated: " + ALL_MODELS),
+    workers: int = typer.Option(0, help="Worker processes (0 = CPU count - 1)"),
 ) -> None:
-    """Fit forecasting models and store results."""
-    errs = pipeline.run_forecasts(_symbols(sample), models.split(","))
-    typer.echo(f"Forecasts done; errors: {len(errs)}")
-    for e in errs:
+    """Fit forecasting models in parallel and store results."""
+    results = pipeline.run_forecasts(_symbols(sample), models.split(","), workers or None)
+    errors = [(r.symbol, m, e) for r in results for m, e in r.errors.items()]
+    typer.echo(f"Forecasts done for {len(results)} symbols; errors: {len(errors)}")
+    for e in errors[:20]:
         typer.echo(f"  {e}")
 
 
 @app.command()
-def refresh(sample: bool = typer.Option(True, help="Only the Phase 1 sample tickers")) -> None:
-    """Universe + prices + forecasts in one go."""
-    universe()
-    fetch(sample=sample)
-    forecast(sample=sample, models=",".join(MODELS))
+def refresh(
+    sample: bool = SAMPLE,
+    models: str = typer.Option(ALL_MODELS),
+    workers: int = typer.Option(0, help="Worker processes (0 = CPU count - 1)"),
+) -> None:
+    """Nightly job: universe + incremental prices + all forecasts + run report."""
+    symbols = list(settings.sample_tickers) if sample else None
+    report = pipeline.refresh(symbols, models.split(","), workers or None)
+    typer.echo(report.summary())
 
 
 @app.command()
-def spike(models: str = typer.Option(",".join(MODELS))) -> None:
+def spike(models: str = typer.Option(ALL_MODELS)) -> None:
     """Time each model on the sample tickers and extrapolate to the full index."""
     df = pipeline.time_models(list(settings.sample_tickers), models.split(","))
     summary = df.groupby("model")["seconds"].agg(["mean", "median", "max"])

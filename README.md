@@ -7,14 +7,14 @@ Educational web app that helps new investors understand any S&P 500 stock throug
 Planning docs: [`docs/pm/`](docs/pm/) — PRD, roadmap, decisions, status.
 
 ## Status
-Phase 1 (walking skeleton + model speed spike). See [`docs/pm/STATUS.md`](docs/pm/STATUS.md).
+Phase 2 (full 503-ticker pipeline) complete. See [`docs/pm/STATUS.md`](docs/pm/STATUS.md).
 
 ## Run locally
 Requires [uv](https://docs.astral.sh/uv/) (it installs Python 3.12 for you).
 
 ```bash
 make install     # backend deps
-make refresh     # S&P 500 list + 5y prices + forecasts for the 20 sample tickers
+make refresh     # all 503 tickers: incremental prices + every model (~1 min on 16 cores)
 make dev         # API + skeleton page at http://localhost:8000
 make test        # unit tests
 make spike       # time every model; extrapolates to all 503 tickers
