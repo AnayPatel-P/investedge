@@ -1,4 +1,4 @@
-"""Batch jobs: universe, incremental prices, parallel forecasts, run report, spike timing."""
+"""Batch jobs: universe, prices, forecasts, risk metrics, backtest/scorecard, run report."""
 
 import json
 import logging
@@ -11,7 +11,7 @@ from datetime import date, datetime
 
 import pandas as pd
 
-from investedge import prices, storage, universe
+from investedge import backtest, prices, risk, storage, universe
 from investedge.config import settings
 from investedge.models.forecasters import MODELS
 
@@ -35,12 +35,15 @@ def all_symbols() -> list[str]:
         return [r[0] for r in con.execute("SELECT symbol FROM tickers ORDER BY symbol").fetchall()]
 
 
-def load_prices(symbols: list[str]) -> prices.FetchResult:
+def load_prices(symbols: list[str], full: bool = False) -> prices.FetchResult:
+    """Fetch prices for `symbols` plus the benchmark. `full` ignores stored data
+    (used once to backfill new columns such as dividends)."""
+    symbols = list(dict.fromkeys([*symbols, settings.benchmark]))
     with storage.connect() as con:
         last_dates = dict(
             con.execute("SELECT symbol, max(date) FROM prices GROUP BY symbol").fetchall()
         )
-        last_dates = {s: d for s, d in last_dates.items() if s in set(symbols)}
+        last_dates = {} if full else {s: d for s, d in last_dates.items() if s in set(symbols)}
 
         def stored_tail(sym: str, since: date) -> pd.DataFrame:
             df = con.execute(
@@ -50,7 +53,8 @@ def load_prices(symbols: list[str]) -> prices.FetchResult:
             return df
 
         result = prices.fetch_prices(symbols, settings.history_years, last_dates, stored_tail)
-        for sym in result.readjusted:  # full history replaces the old adjusted series
+        replaced = result.full + result.readjusted if full else result.readjusted
+        for sym in replaced:  # full history replaces the old adjusted series
             con.execute("DELETE FROM prices WHERE symbol = ?", [sym])
         storage.replace_rows(con, "prices", result.prices, ["symbol", "date"])
     return result
@@ -157,6 +161,93 @@ def _store_forecasts(results: list[SymbolForecast]) -> None:
         storage.replace_rows(con, "forecasts", df, ["symbol", "model", "date"])
 
 
+# ---------------------------------------------------------------- risk metrics
+
+
+def compute_metrics() -> int:
+    with storage.connect(read_only=True) as con:
+        px = con.execute(
+            "SELECT symbol, date, close, dividend FROM prices ORDER BY symbol, date"
+        ).df()
+    m = risk.compute_metrics(px, settings.benchmark)
+    cols = [
+        "symbol",
+        "as_of",
+        "last_close",
+        "return_1y",
+        "volatility_1y",
+        "beta_1y",
+        "max_drawdown_1y",
+        "max_drawdown_5y",
+        "dividend_yield",
+        "sharpe_1y",
+        "risk_score",
+        "risk_level",
+    ]
+    with storage.connect() as con:
+        con.execute("DELETE FROM metrics")
+        storage.replace_rows(con, "metrics", m[cols], ["symbol"])
+    return len(m)
+
+
+# ---------------------------------------------------------------- backtest
+
+
+def _backtest_worker(symbol: str, close: pd.Series, models: list[str]) -> backtest.SymbolBacktest:
+    return backtest.backtest_symbol(
+        symbol,
+        close,
+        {m: MODELS[m] for m in models},
+        settings.forecast_horizon,
+        settings.backtest_origins,
+        settings.backtest_spacing,
+        MIN_HISTORY,
+    )
+
+
+def backtest_age_days() -> int | None:
+    with storage.connect(read_only=True) as con:
+        last = con.execute("SELECT max(run_date) FROM scorecard").fetchone()
+    return None if not last or last[0] is None else (date.today() - last[0]).days
+
+
+def run_backtest(
+    symbols: list[str], models: list[str], workers: int | None = None
+) -> tuple[int, list[dict]]:
+    """Rolling-origin backtest for all symbols; stores per-step predictions and the scorecard.
+    Returns (symbols scored, errors)."""
+    if backtest.BASELINE not in models:
+        models = [backtest.BASELINE, *models]
+    panel = load_close_panel(symbols)
+    todo = [(s, panel[s]) for s in symbols if s in panel]
+    workers = workers or default_workers()
+    results: list[backtest.SymbolBacktest] = []
+    if workers == 1:
+        results = [_backtest_worker(s, c, models) for s, c in todo]
+    else:
+        with ProcessPoolExecutor(max_workers=workers) as pool:
+            futures = [pool.submit(_backtest_worker, s, c, models) for s, c in todo]
+            for i, fut in enumerate(as_completed(futures), 1):
+                results.append(fut.result())
+                if i % 50 == 0:
+                    log.info("Backtest: %d/%d symbols", i, len(todo))
+
+    errors = [
+        {"symbol": r.symbol, "model": m, "error": e} for r in results for m, e in r.errors.items()
+    ]
+    frames = [f for r in results for f in r.rows]
+    if not frames:
+        return 0, errors
+    bt = pd.concat(frames, ignore_index=True)
+    card = backtest.score(bt).assign(run_date=date.today())
+    with storage.connect() as con:
+        con.execute("DELETE FROM backtest_forecasts")
+        con.execute("DELETE FROM scorecard")
+        storage.replace_rows(con, "backtest_forecasts", bt, ["symbol", "model", "origin", "step"])
+        storage.replace_rows(con, "scorecard", card, ["symbol", "model"])
+    return card["symbol"].nunique(), errors
+
+
 # ---------------------------------------------------------------- run report
 
 
@@ -177,6 +268,10 @@ class RunReport:
     model_seconds: dict[str, float] = field(default_factory=dict)
     stage_seconds: dict[str, float] = field(default_factory=dict)
     coverage_pct: float = 0.0
+    metrics_symbols: int = 0
+    backtest_ran: bool = False
+    backtest_symbols: int = 0
+    backtest_errors: list[dict] = field(default_factory=list)
 
     def summary(self) -> str:
         lines = [
@@ -193,6 +288,13 @@ class RunReport:
             "Model CPU-seconds: "
             + ", ".join(f"{k} {v:.1f}" for k, v in sorted(self.model_seconds.items())),
             f"Coverage (data + all models): {self.coverage_pct:.1f}%",
+            f"Risk metrics: {self.metrics_symbols} symbols",
+            (
+                f"Backtest: {self.backtest_symbols} symbols scored, "
+                f"{len(self.backtest_errors)} errors"
+                if self.backtest_ran
+                else "Backtest: skipped (scorecard still fresh)"
+            ),
         ]
         return "\n".join(lines)
 
@@ -218,7 +320,13 @@ def save_report(report: RunReport) -> str:
     return str(path)
 
 
-def refresh(symbols: list[str] | None, models: list[str], workers: int | None = None) -> RunReport:
+def refresh(
+    symbols: list[str] | None,
+    models: list[str],
+    workers: int | None = None,
+    force_backtest: bool = False,
+    full_prices: bool = False,
+) -> RunReport:
     """Full nightly job. `symbols=None` means the whole universe."""
     report = RunReport(started=datetime.now().isoformat(timespec="seconds"))
 
@@ -229,7 +337,7 @@ def refresh(symbols: list[str] | None, models: list[str], workers: int | None = 
     report.stage_seconds["universe"] = time.perf_counter() - t
 
     t = time.perf_counter()
-    fetched = load_prices(symbols)
+    fetched = load_prices(symbols, full=full_prices)
     report.prices_full = len(fetched.full)
     report.prices_incremental = len(fetched.incremental)
     report.prices_readjusted = len(fetched.readjusted)
@@ -256,6 +364,18 @@ def refresh(symbols: list[str] | None, models: list[str], workers: int | None = 
     report.forecast_ok = dict(ok)
     report.model_seconds = dict(secs)
     report.coverage_pct = 100 * complete / max(1, len(symbols))
+
+    t = time.perf_counter()
+    report.metrics_symbols = compute_metrics()
+    report.stage_seconds["metrics"] = time.perf_counter() - t
+
+    age = backtest_age_days()
+    if force_backtest or age is None or age >= settings.backtest_max_age_days:
+        t = time.perf_counter()
+        report.backtest_ran = True
+        report.backtest_symbols, report.backtest_errors = run_backtest(symbols, models, workers)
+        report.stage_seconds["backtest"] = time.perf_counter() - t
+
     report.finished = datetime.now().isoformat(timespec="seconds")
     save_report(report)
     return report

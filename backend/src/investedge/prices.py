@@ -25,7 +25,7 @@ from investedge.universe import to_yahoo
 
 log = logging.getLogger(__name__)
 
-PRICE_COLUMNS = ["symbol", "date", "open", "high", "low", "close", "volume"]
+PRICE_COLUMNS = ["symbol", "date", "open", "high", "low", "close", "volume", "dividend"]
 OVERLAP_DAYS = 7  # calendar days re-fetched to detect adjustment changes
 ADJUSTMENT_TOLERANCE = 0.002  # 0.2% relative close difference => history was re-adjusted
 CHUNK_SIZE = 50
@@ -51,6 +51,7 @@ def yf_download(yahoo_symbols: list[str], window: dict) -> pd.DataFrame:
         yahoo_symbols,
         interval="1d",
         auto_adjust=True,
+        actions=True,  # adds Dividends / Stock Splits columns (needed for dividend yield)
         group_by="ticker",
         threads=True,
         progress=False,
@@ -65,7 +66,8 @@ def clean_ohlcv(df: pd.DataFrame) -> pd.DataFrame:
     df = df.reset_index().rename(columns={"Date": "date", "index": "date"})
     df["date"] = pd.to_datetime(df["date"]).dt.tz_localize(None).dt.normalize()
     df["volume"] = df["volume"].fillna(0).astype("int64")
-    return df[["date", "open", "high", "low", "close", "volume"]]
+    df["dividend"] = df["dividends"].fillna(0.0) if "dividends" in df else 0.0
+    return df[["date", "open", "high", "low", "close", "volume", "dividend"]]
 
 
 def split_frame(raw: pd.DataFrame, symbols: list[str]) -> dict[str, pd.DataFrame]:

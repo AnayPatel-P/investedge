@@ -19,7 +19,48 @@ CREATE TABLE IF NOT EXISTS prices (
     date DATE,
     open DOUBLE, high DOUBLE, low DOUBLE, close DOUBLE,
     volume BIGINT,
+    dividend DOUBLE DEFAULT 0,
     PRIMARY KEY (symbol, date)
+);
+ALTER TABLE prices ADD COLUMN IF NOT EXISTS dividend DOUBLE DEFAULT 0;
+CREATE TABLE IF NOT EXISTS metrics (
+    symbol VARCHAR PRIMARY KEY,
+    as_of DATE,
+    last_close DOUBLE,
+    return_1y DOUBLE,
+    volatility_1y DOUBLE,
+    beta_1y DOUBLE,
+    max_drawdown_1y DOUBLE,
+    max_drawdown_5y DOUBLE,
+    dividend_yield DOUBLE,
+    sharpe_1y DOUBLE,
+    risk_score DOUBLE,
+    risk_level VARCHAR
+);
+CREATE TABLE IF NOT EXISTS backtest_forecasts (
+    symbol VARCHAR,
+    model VARCHAR,
+    origin DATE,
+    step INTEGER,
+    date DATE,
+    actual DOUBLE,
+    mean DOUBLE,
+    lo_80 DOUBLE, hi_80 DOUBLE,
+    lo_95 DOUBLE, hi_95 DOUBLE,
+    PRIMARY KEY (symbol, model, origin, step)
+);
+CREATE TABLE IF NOT EXISTS scorecard (
+    symbol VARCHAR,
+    model VARCHAR,
+    run_date DATE,
+    n_origins INTEGER,
+    mae DOUBLE,
+    mape DOUBLE,
+    coverage_80 DOUBLE,
+    coverage_95 DOUBLE,
+    skill DOUBLE,
+    beats_baseline BOOLEAN,
+    PRIMARY KEY (symbol, model)
 );
 CREATE TABLE IF NOT EXISTS forecasts (
     symbol VARCHAR,

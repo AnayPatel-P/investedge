@@ -56,11 +56,34 @@ def refresh(
     sample: bool = SAMPLE,
     models: str = typer.Option(ALL_MODELS),
     workers: int = typer.Option(0, help="Worker processes (0 = CPU count - 1)"),
+    force_backtest: bool = typer.Option(False, "--backtest", help="Re-run the backtest now"),
+    full_prices: bool = typer.Option(False, "--full-prices", help="Re-download all history"),
 ) -> None:
-    """Nightly job: universe + incremental prices + all forecasts + run report."""
+    """Nightly job: universe, prices, forecasts, risk metrics, backtest (weekly), run report."""
     symbols = list(settings.sample_tickers) if sample else None
-    report = pipeline.refresh(symbols, models.split(","), workers or None)
+    report = pipeline.refresh(
+        symbols, models.split(","), workers or None, force_backtest, full_prices
+    )
     typer.echo(report.summary())
+
+
+@app.command()
+def metrics() -> None:
+    """Recompute risk metrics from stored prices."""
+    typer.echo(f"Metrics for {pipeline.compute_metrics()} symbols")
+
+
+@app.command()
+def backtest(
+    sample: bool = SAMPLE,
+    models: str = typer.Option(ALL_MODELS),
+    workers: int = typer.Option(0, help="Worker processes (0 = CPU count - 1)"),
+) -> None:
+    """Rolling-origin backtest + scorecard."""
+    n, errors = pipeline.run_backtest(_symbols(sample), models.split(","), workers or None)
+    typer.echo(f"Scored {n} symbols; errors: {len(errors)}")
+    for e in errors[:20]:
+        typer.echo(f"  {e}")
 
 
 @app.command()

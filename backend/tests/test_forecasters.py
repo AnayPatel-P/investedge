@@ -51,7 +51,7 @@ def test_clean_ohlcv_drops_bad_rows() -> None:
     )
     out = clean_ohlcv(raw)
     assert len(out) == 1  # NaN open, high<low, and zero close are dropped
-    assert list(out.columns) == ["date", "open", "high", "low", "close", "volume"]
+    assert list(out.columns) == ["date", "open", "high", "low", "close", "volume", "dividend"]
 
 
 def test_to_yahoo_share_class() -> None:

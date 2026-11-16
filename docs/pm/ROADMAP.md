@@ -37,15 +37,15 @@ Timeline target: a few weeks, solo. Phases 1–5 are v1-critical; Phase 6 can sl
 ## Phase 3 — Scorecard, risk metrics & risk-profile logic
 **Goal:** the "honesty" and "personalization" brains, exposed via API.
 **Demo:** API returns a scorecard for AAPL (with beats-baseline verdict), a ranked screener for "conservative", and three example portfolios.
-- [ ] 3.1 Rolling-origin backtest (last 12 months) for each model + naive; MAE, MAPE, band coverage
-- [ ] 3.2 Risk metrics per ticker: annualized volatility, beta vs. SPY, max drawdown, 1Y return, dividend yield
-- [ ] 3.3 Risk-profile thresholds + fit score per ticker (conservative/moderate/aggressive)
-- [ ] 3.4 Rule-based example portfolios per profile (sector-diversified, labelled as examples)
-- [ ] 3.5 API: `/scorecard`, `/metrics`, `/screener?profile=`, `/example-portfolios?profile=`, `/search`
-- [ ] 3.6 Tests for metric math and backtest (no look-ahead leakage)
+- [x] 3.1 Rolling-origin backtest (last 12 months) for each model + naive; MAE, MAPE, band coverage
+- [x] 3.2 Risk metrics per ticker: annualized volatility, beta vs. SPY, max drawdown, 1Y return, dividend yield
+- [x] 3.3 Risk-profile thresholds + fit score per ticker (conservative/moderate/aggressive)
+- [x] 3.4 Rule-based example portfolios per profile (sector-diversified, labelled as examples)
+- [x] 3.5 API: `/scorecard`, `/metrics`, `/screener?profile=`, `/example-portfolios?profile=`, `/search`
+- [x] 3.6 Tests for metric math and backtest (no look-ahead leakage)
 **Done when:**
-- [ ] All endpoints return data for every covered ticker
-- [ ] Backtest verified leak-free by test
+- [x] All endpoints return data for every covered ticker
+- [x] Backtest verified leak-free by test
 
 ## Phase 4 — UI design & build (with `original-ui`)
 **Goal:** a distinctive, beginner-friendly interface for the core flow.
