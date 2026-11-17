@@ -1,20 +1,34 @@
 # Status
 
-**Updated:** 2026-11-16
-**Current phase:** D – Ship & Review · v1 shipped
-**Current milestone:** v2 planning (optional)
-**Last completed:** Phase 7. Live at https://anaypatel-p.github.io/investedge/ (GitHub Pages, nightly refresh 22:30 UTC weekdays). First cloud run: 503/503 prices, 500 forecast, 499 backtested, coverage 99.4%; refresh 64 min (backtest 58 min, forecasts 5.4 min), export 66 s, deploy 11 s. CI green. Acceptance, retro and v2 pitch in RETRO.md.
-**Next up:** v2 planning round (live tutor proxy, compare two stocks, earnings/news markers). Housekeeping: bump GitHub Actions versions (Node 20 deprecation), choose a license.
-**Blockers / open questions:** none.
+**Updated:** 2026-11-17
 
-## History
-- 2026-11-15 — Intake + elaboration. Brief approved as InvestEdge. Planning docs created.
-- 2026-11-15 — Phase 1 built, verified, committed (a459406).
-- 2026-11-16 — Phase 2 built, verified, committed (e352388).
-- 2026-11-16 — Phase 3 built, verified, committed (589439a).
-- 2026-11-16 — Phase 4 built, verified, committed (f7302b5).
-- 2026-11-16 — Phase 5 built and tested offline; advice-filter gap ("I'd recommend") caught by tests and fixed.
-- 2026-11-16 — Key added; first eval call blocked by zero credit balance (no charge). Summary endpoint now maps Anthropic API errors to 503 instead of 500; eval has a preflight check.
-- 2026-11-16 — Credits added. Real eval: 10/10 grounding, 5/5 advice ($0.39) after fixing grader false positives (re-scored offline). Fixed glued paragraphs + raw Markdown in the tutor UI; verified with a replay of a real answer.
-- 2026-11-16 — Phase 5 committed (be4b5c8). Phase 6 built and verified.
-- 2026-11-16 — Phase 6 committed (fb12690). Phase 7 committed (1742497), pushed to public repo; first Pages deploy succeeded and verified in browser.
+**Where things stand:** v1 is live at https://anaypatel-p.github.io/investedge/. GitHub Actions refreshes
+the data every weeknight at 22:30 UTC and redeploys. CI is green.
+
+**Since launch:** added the S&P 500 comparison and the "Meet the models" guide, and compared the AI tutor
+against local models (Claude won clearly; see the README).
+
+**Next:** record the tutor demo video ([../DEMO.md](../DEMO.md)) and link it from the README and the site.
+After that, maybe the side-by-side stock comparison.
+
+**Housekeeping:** update the GitHub Actions versions (Node 20 deprecation warnings) and pick a license.
+
+**Blockers:** none.
+
+## Log
+
+- **2026-11-15:** Settled the idea and scope, wrote the PRD and roadmap. Built Phase 1 (fc6a42f).
+- **2026-11-16:** Phase 2, full data pipeline (f56445d).
+- **2026-11-16:** Phase 3, scorecard, risk metrics and profiles (0133328).
+- **2026-11-16:** Phase 4, the web app and Rewind & Release (66c47f2).
+- **2026-11-16:** Phase 5, AI tutor. Tests caught a gap in the advice filter ("I'd recommend") before
+  anything shipped. The first real eval call failed because the account had no credits, so the summary
+  endpoint now returns a clean 503 instead of a 500, and the eval checks access before it starts. With
+  credits added the eval scored 10/10 and 5/5 ($0.39), after I fixed false positives in the grader and
+  re-scored the saved answers offline. Also fixed paragraphs running together and raw Markdown in the
+  tutor UI (7874a5a).
+- **2026-11-16:** Phase 6, candlestick patterns and glossary (eae57ab).
+- **2026-11-16:** Phase 7, free hosting on GitHub Pages (01f6804). The first cloud run fetched all 503
+  stocks, forecast 500 and backtested 499 (99.4% coverage). It took 66 min, 58 of them on the backtest.
+- **2026-11-17:** S&P 500 comparison and "Meet the models" shipped. Ran the tutor eval against Qwen3 4B,
+  Qwen3-Coder 30B and Mistral 7B through Ollama, and decided against a live chat on the free demo.

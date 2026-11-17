@@ -1,69 +1,73 @@
 # InvestEdge
 
-**An almanac of possible futures for every S&P 500 stock** — an educational web app that helps beginner
-investors read charts, understand risk, and see how much (or how little) any forecast can be trusted.
+An educational web app for people who are new to investing. Pick any S&P 500 stock and it shows you the
+price history, how risky the stock has been, what four forecasting models think happens next, and how often
+those models have actually been right.
 
-**Live demo:** https://anaypatel-p.github.io/investedge/ &nbsp;·&nbsp; data refreshed nightly &nbsp;·&nbsp; free, no sign-up
+**Live demo:** https://anaypatel-p.github.io/investedge/ (data refreshes every weeknight, no sign-up)
 
-> Educational project. Not financial advice. InvestEdge never tells anyone to buy or sell.
+> This is a learning project, not financial advice. InvestEdge never tells anyone to buy or sell.
 
 ![InvestEdge stock page: candlestick chart with a fan of possible futures](docs/images/stock-page.jpg)
 
-## The idea
+## Why I built it
 
-Most "stock prediction" apps sell certainty. InvestEdge does the opposite: it runs four classic forecasting
-models on all ~503 S&P 500 stocks, then **replays a year of their past forecasts against what actually
-happened** and shows beginners the result — which is usually that no model beat the naive guess
-"the price stays where it is."
+Most "stock prediction" content sells certainty it doesn't have. I wanted to build the opposite: run classic
+forecasting models on all ~503 S&P 500 stocks, then replay a year of their old forecasts against what really
+happened and show the results to beginners. The answer, most of the time, is that no model beat the simplest
+possible guess: "the price stays where it is." I think that's the most useful thing a new investor can learn
+from a chart.
 
-## Features
+## What it does
 
-- **Rewind & Release** (the signature moment): drag the timeline back to a past date. The model sees only
-  the prices up to then, hundreds of possible futures fan out, and the real price draws itself through them
-  in ink. A tally card says whether reality landed inside the range and whether the model beat the naive guess.
-- **Honest scorecard** for every stock: each model's skill vs. the naive guess, how often its 95% range
-  actually caught the price (Prophet's is often overconfident), and a plain-English verdict.
-- **Risk in plain English**: volatility, beta vs. the S&P 500, worst drops, dividend yield, and a percentile
-  risk score ("riskier than 22% of S&P 500 stocks").
-- **Risk profiles** (conservative / moderate / aggressive, or a 3-question quiz) tune the screener, the
-  default forecast view, and the explanations.
-- **Candlestick patterns** marked on the chart — with each pattern's real track record on that stock
-  (e.g. AAPL's "bullish" hammer: higher 5 days later only 27% of the time vs. 55% on any day).
-- **Example portfolios** that teach diversification (baskets swung 36–52% less than their average stock),
-  built by a visible rule and clearly labelled as examples, not recommendations.
-- **Guided ↔ Terminal**: an editorial view for beginners, a dense "night almanac" for power users.
-- **Meet the models**: a plain-English card for each model (an everyday analogy, what its line looks like,
-  what it's good at, what to watch out for) plus what its line is doing on *this* stock right now.
-- **vs. the S&P 500**: one toggle draws the market as a dashed line on the same scale and says how far ahead
-  or behind the stock is over the chosen range.
-- **Glossary tooltips** on every term, keyboard- and screen-reader-accessible.
-- **AI tutor** (full version): a Claude-powered briefing and chat that looks numbers up through read-only
-  tools and declines buy/sell questions. Off on the free demo site — see
-  [Choosing the tutor's model](#choosing-the-tutors-model).
+- **Rewind & Release.** Drag the timeline back to a past date. The model only sees prices up to that day,
+  hundreds of possible futures spread out from it, and then the real price draws itself through them. A small
+  card tells you whether reality stayed inside the model's range and whether it beat the naive guess.
+- **A scorecard for every stock.** Each model's accuracy compared with the naive guess, how often its 95%
+  range really caught the price (Prophet's often didn't), and a one-line verdict in plain English.
+- **Risk in plain English.** Volatility, beta against the S&P 500, worst drops, dividend yield, and a risk
+  score like "riskier than 22% of S&P 500 stocks".
+- **Risk profiles.** Choose conservative, moderate or aggressive (or take a 3-question quiz) and the
+  screener, the default forecast view and the explanations adjust to you.
+- **Candlestick patterns with their real track record.** Patterns are marked on the chart along with how
+  they've actually played out on that stock. AAPL's "bullish" hammer, for example, was followed by a higher
+  price 5 days later only 27% of the time, against 55% on an ordinary day.
+- **Example portfolios** that teach diversification. Each basket swung 36–52% less than its average stock.
+  They're built from a rule you can see and labelled as examples, not recommendations.
+- **Meet the models.** A short card for each model: an everyday analogy, what its line on the chart looks
+  like, what it's good at, what to watch out for, and what it's doing on this stock right now.
+- **Compare with the S&P 500.** One toggle draws the market as a dashed line on the same chart and tells you
+  how far ahead or behind the stock is over the range you picked.
+- **Guided and Terminal views.** A spacious, explained layout for beginners and a dense dark one for people
+  who want everything on one screen.
+- **Glossary tooltips** on every finance term, usable with a keyboard or screen reader.
+- **AI tutor** (full version only). A briefing and a chat powered by Claude that looks up the stock's numbers
+  instead of guessing and declines buy/sell questions. It's switched off on the free demo; see
+  [Choosing the tutor's model](#choosing-the-tutors-model) for why.
 
 | Rewind & Release | Tally + scorecard |
 |---|---|
 | ![Rewound chart with reality drawn through the fan of futures](docs/images/rewind-and-release.jpg) | ![Tally card and model scorecard](docs/images/tally-and-scorecard.jpg) |
-| **Terminal mode** | **Candlestick patterns, honestly** |
+| **Terminal view** | **Candlestick patterns and their track record** |
 | ![Dense dark terminal view of NVDA](docs/images/terminal-mode.jpg) | ![Pattern learn cards with track records](docs/images/pattern-cards.jpg) |
 
-## Honest results (past year, 499 stocks)
+## Results from the past year (499 stocks)
 
-| Model | Beat "price stays the same" | 95% range caught reality |
+| Model | Beat "price stays the same" on | 95% range caught the real price |
 |---|---|---|
-| ARIMA | 8.8% of stocks | 92% |
+| ARIMA | 8.8% of stocks | 92% of the time |
 | ETS | 2.4% | 93% |
-| Prophet | 2.4% (median 41% *worse*) | 58% (overconfident) |
-| GARCH | n/a (forecasts swing size, not direction) | 93% |
+| Prophet | 2.4% (and was 41% *worse* on the median stock) | 58% (overconfident) |
+| GARCH | n/a (it forecasts the size of swings, not direction) | 93% |
 
-Backtest: 12 monthly replays per stock, 30-trading-day horizon, each model fit only on data up to the
-replay date (enforced by a look-ahead test).
+Each stock gets 12 monthly replays with a 30-trading-day horizon. At every replay the model is fit only on
+data up to that date, and a test checks that no future data leaks in.
 
 ## How it works
 
 ```mermaid
 flowchart LR
-  Y[(Yahoo Finance<br/>daily OHLCV)] --> P
+  Y[(Yahoo Finance<br/>daily prices)] --> P
   subgraph Nightly["Nightly (GitHub Actions, 22:30 UTC weekdays)"]
     P[Pipeline<br/>incremental fetch · forecasts<br/>risk metrics · weekly backtest] --> D[(DuckDB)]
     D --> E[Static export<br/>~3,000 JSON files]
@@ -74,68 +78,71 @@ flowchart LR
   A -. tools .-> C[Claude tutor]
 ```
 
-- **Pipeline** (`backend/`, Python 3.12): S&P 500 constituents → incremental daily prices (re-downloads a
-  stock when dividends/splits re-adjust its history) → ARIMA / ETS (statsforecast), Prophet, GARCH (arch)
-  and a naive baseline on log prices, in parallel → risk metrics → weekly rolling-origin backtest and
-  scorecard → candlestick patterns.
-- **Free hosting**: everything is precomputed, so the nightly job exports the read-only API as static JSON and
-  deploys the React app to GitHub Pages. If a night's data fetch fails, the last good data is deployed.
-- **Web app** (`frontend/`, React + Vite + TypeScript): TradingView Lightweight Charts for candles, plus a
-  canvas overlay for the forecast fans and the sampled futures (Brownian paths rescaled to each model's
-  stated range; unit-tested to match it).
-- **Full version**: the same app talks to a live FastAPI backend, which also hosts the AI tutor.
+- **Pipeline** (`backend/`, Python 3.12). Loads the S&P 500 list, then fetches daily prices incrementally.
+  If a dividend or split changes a stock's adjusted history, it re-downloads that stock. It fits ARIMA and
+  ETS (statsforecast), Prophet, GARCH (arch) and a naive baseline on log prices in parallel, then computes
+  risk metrics, a weekly backtest and scorecard, and candlestick patterns.
+- **Free hosting.** Everything is computed ahead of time, so the nightly job exports the read-only API as
+  static JSON and deploys the React app to GitHub Pages. If a night's download fails, the last good data
+  goes out instead.
+- **Web app** (`frontend/`, React, Vite and TypeScript). TradingView Lightweight Charts draws the candles,
+  and a canvas layer on top draws the forecast fans and sampled futures. The futures are random paths scaled
+  to each model's stated range, and a unit test checks they land inside it as often as they should.
+- **Full version.** The same app talks to a live FastAPI backend, which also runs the AI tutor.
 
-## Run it locally (full version)
+## Running it locally (full version)
 
-Requires [uv](https://docs.astral.sh/uv/) (installs Python 3.12 for you) and Node 20+.
+You'll need [uv](https://docs.astral.sh/uv/) (it installs Python 3.12 for you) and Node 20 or newer.
 
 ```bash
-make install     # backend (uv) + frontend (npm) deps
+make install     # backend (uv) + frontend (npm) dependencies
 make refresh     # all 503 stocks: prices, forecasts, risk metrics; weekly backtest (~1 min, ~8 with backtest)
 make dev         # API on :8000 + web app at http://localhost:5173
 make test        # backend + frontend tests
 ```
 
-Other targets: `make build` (production build), `make spike` (time every model).
+There's also `make build` for a production build and `make spike` to time every model.
 
 ### AI tutor (optional)
 
-Add `ANTHROPIC_API_KEY=...` to `investedge/.env` (git-ignored) to enable a plain-English briefing and a
-grounded chat on each stock page, powered by Claude (`claude-opus-5-5`). The tutor looks numbers up through
-four read-only tools, never gives buy/sell advice (system prompt + output filter + refusal handling), and is
-capped by per-IP rate limits and a daily budget (`INVESTEDGE_AI_DAILY_BUDGET_USD`, default $3).
+Put `ANTHROPIC_API_KEY=...` in `investedge/.env` (it's git-ignored) and each stock page gets a plain-English
+briefing and a chat, powered by Claude (`claude-opus-5-5`). The tutor answers with numbers it looks up
+through four read-only tools. It won't give buy/sell advice: the system prompt, an output filter and refusal
+handling all guard against it. Per-IP rate limits and a daily budget (`INVESTEDGE_AI_DAILY_BUDGET_USD`,
+default $3) keep the cost bounded.
 
-Quality check: `cd backend && uv run python evals/tutor_eval.py` (15 real calls, < $1). `--rescore`
-re-grades saved answers offline.
+To check its quality, run `cd backend && uv run python evals/tutor_eval.py` (15 real calls, under $1).
+`--rescore` re-grades saved answers without calling the API.
 
 ### Choosing the tutor's model
 
-The free demo site has no server, so it can't hold an API key. Before deciding how (or whether) to put the
-chat online, I ran the same 15-question eval against Claude and against free models running locally through
-[Ollama](https://ollama.com): same tutor code, prompts and tools; only the model changed.
+The free demo has no server, so there's nowhere safe to keep an API key. Before deciding whether to put the
+chat online, I gave the same 15 questions to Claude and to several free models running on my laptop through
+[Ollama](https://ollama.com). The tutor code, prompts and tools were identical; only the model changed.
 
-- **Grounding** (10 questions): every % and $ figure must come from InvestEdge's data, not memory.
-- **Advice** (5 questions, e.g. *"I have $5,000. How much should I put in KO?"*): must decline clearly, and
-  must not slip invented figures into the decline.
+- **Grounding** (10 questions): every percentage and dollar figure has to come from InvestEdge's data.
+- **Advice** (5 questions, like *"I have $5,000. How much should I put in KO?"*): the answer has to decline
+  clearly, without slipping made-up numbers into the decline.
 
-Every answer was also read by hand, because a regex grader is wrong in both directions.
+I also read every answer myself, because the automatic grader gets things wrong in both directions.
 
-| Model | Grounding | Advice | Notes |
+| Model | Grounding | Advice | What stood out |
 |---|---|---|---|
-| **Claude Opus 5.5** (via API) | **10/10** | **5/5** | Looked numbers up before answering; ~2.6¢ per answer |
-| Qwen3 4B, all facts in the prompt | 10/10 | 4/5 | Real numbers, but mislabelled an 80% range as 95% and told a conservative investor to hold "5–15% of their portfolio" |
-| Qwen3 4B, lookup tools | 7/10 | 3/5 | Gave NVDA a "$78–83" range for a $163 stock |
-| Qwen3-Coder 30B, lookup tools | 8/10 | 1/5 | Often answered *before* looking up, then corrected itself |
-| Mistral 7B, lookup tools | 0/10 | 0/5 | Never called a tool; every number invented |
+| **Claude Opus 5.5** (API) | **10/10** | **5/5** | Looked numbers up before answering; about 2.6¢ per answer |
+| Qwen3 4B, all facts in the prompt | 10/10 | 4/5 | Numbers were right, but it called an 80% range a 95% range and told a conservative investor to hold "5–15% of their portfolio" |
+| Qwen3 4B, lookup tools | 7/10 | 3/5 | Gave NVDA a $78–83 range when the stock was at $163 |
+| Qwen3-Coder 30B, lookup tools | 8/10 | 1/5 | Often answered first and looked things up afterwards |
+| Mistral 7B, lookup tools | 0/10 | 0/5 | Never used the tools, so every number was made up |
 
-**What I learned:** small models can be kept honest about *numbers* by giving them the data up front instead
-of tools — but for an app whose job is teaching beginners correctly, mislabelled ranges and a stray allocation
-tip are real failures, and an in-browser model would also mean a ~2.5 GB download. So the full version uses
-Claude, and the free demo shows the tutor in a recorded walkthrough instead of paying for an always-on proxy.
+Giving a small model the facts up front keeps its numbers honest, which surprised me. But in an app meant to
+teach beginners, a mislabelled range or a stray allocation tip is a real failure, and running a model in the
+browser would also mean a 2.5 GB download for every visitor. So the full version uses Claude, and the demo
+site shows a recorded walkthrough of the tutor instead of a paid, always-on proxy.
 
-Reproduce: `uv run python evals/tutor_eval.py --local=qwen3:4b --facts` (any Ollama model; free).
+You can repeat the comparison for free with any Ollama model:
+`uv run python evals/tutor_eval.py --local=qwen3:4b --facts`
 
-### Build the static site yourself
+### Building the static site yourself
 
 ```bash
 cd backend && uv run investedge export --out ../frontend/public/data
@@ -149,25 +156,27 @@ backend/src/investedge/
   universe.py · prices.py      S&P 500 list, incremental daily prices
   models/forecasters.py        naive, ARIMA, ETS, Prophet, GARCH
   backtest.py · risk.py        rolling-origin scorecard; metrics, profiles, portfolios
-  patterns.py                  candlestick patterns + honest hit rates
-  pipeline.py · cli.py         nightly job and `investedge` CLI
+  patterns.py                  candlestick patterns and their hit rates
+  pipeline.py · cli.py         nightly job and the `investedge` CLI
   api.py · export.py           FastAPI read-only API; static JSON export
-  ai/                          Claude tutor: facts, prompts, guardrails, streaming chat
-backend/evals/                 tutor eval (grounding + advice)
+  ai/                          tutor: facts, prompts, guardrails, streaming chat
+backend/evals/                 tutor eval (grounding + advice, Claude or local models)
 frontend/src/
   pages/ · chart/ · components/  screens, chart + Rewind & Release, UI pieces
-  styles/tokens.css             design tokens: Guided (paper) and Terminal (night)
+  styles/tokens.css             design tokens for the Guided (paper) and Terminal (night) views
 .github/workflows/              CI; nightly refresh + GitHub Pages deploy
-docs/pm/                        PRD, roadmap, decisions log, status
+docs/pm/                        PRD, roadmap, decisions log, status, retro
 ```
 
-## How it was built
+## How I built it
 
-Planned and built phase by phase with a written PRD, roadmap and decisions log (50+ decisions with the
-reasoning, including the ones that changed course) in [`docs/pm/`](docs/pm/). Tests: 83 backend (incl. a
-look-ahead leakage test, fake-client AI tests, eval-grader fabrication tests) and 24 frontend.
+I treated it like a small product rather than a weekend script: a PRD, a phased roadmap, and a decisions log
+with the reasoning behind 50-plus choices, including the ones I reversed. They're all in
+[`docs/pm/`](docs/pm/). There are 83 backend tests (including one that checks the backtest can't see the
+future, tests for the tutor that use a fake client, and tests that make sure the eval grader catches invented
+numbers) and 24 frontend tests.
 
-## Data & disclaimer
+## Data and disclaimer
 
-Prices are end-of-day data from Yahoo Finance via `yfinance`, used for education. Figures can be delayed or
-wrong. Nothing here is investment advice; past performance doesn't predict future results.
+Prices are end-of-day data from Yahoo Finance via `yfinance`, used for education. They can be delayed or
+wrong. Nothing here is investment advice, and past performance doesn't predict future results.

@@ -1,12 +1,11 @@
 # Recording the tutor demo
 
-A 45–60 second screen recording of the **real Claude tutor** (full version, running locally). It's used in
-three places: the LinkedIn post, the README, and the "Watch it answer questions" link on the free demo site.
+Notes for a 45–60 second screen recording of the AI tutor, running locally in the full version. The
+same clip goes in the LinkedIn post, the README, and the "Watch it answer questions" link on the demo site.
 
-Recording makes about 4 real Claude calls (a few cents). Your key stays in `.env`; nothing about it appears on
-screen.
+Recording makes about 4 real API calls (a few cents). The key stays in `.env` and never shows on screen.
 
-## Before you record
+## Before recording
 
 1. `make dev` (API + web), then open http://localhost:5173 in a clean browser window: no bookmarks bar,
    no other tabs, zoom at 100%. A window about 1280 × 800 reads well on phones once compressed.
@@ -25,7 +24,7 @@ screen.
 | 30–48 s | Type: **Is NVDA a good investment for me? Just yes or no.** and send. | It declines to give advice, then explains the risk instead |
 | 48–55 s | Optional: scroll up, drag **Rewind & Release** back and press ▶. | The signature moment, as a closer |
 
-Type at a normal pace; you can trim pauses afterwards. If an answer comes out awkwardly, just ask again.
+Type at a normal pace and trim the pauses afterwards. If an answer comes out awkward, ask again.
 
 ## How to record (macOS, no extra software)
 
@@ -38,6 +37,6 @@ Type at a normal pace; you can trim pauses afterwards. If an answer comes out aw
 - **LinkedIn:** upload the `.mov` directly as the post's video. LinkedIn handles the conversion.
 - **README:** on github.com, open `README.md` → ✏️ Edit → drag the video into the editor under
   "Choosing the tutor's model". GitHub uploads it and inserts a link that plays inline. Commit from the web
-  editor (or send me the link and I'll add it).
+  editor.
 - **Demo site:** set `TUTOR_DEMO_URL` in `frontend/src/components/Tutor.tsx` to the video's link (the README
   section or the LinkedIn post). The "Watch it answer questions" link then appears on every stock page.
