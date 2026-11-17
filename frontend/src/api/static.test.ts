@@ -7,6 +7,7 @@ describe("staticUrl", () => {
   it("maps every read-only endpoint to its exported file", () => {
     expect(staticUrl("/tickers", B)).toBe(`${B}/tickers.json`);
     expect(staticUrl("/profiles", B)).toBe(`${B}/profiles.json`);
+    expect(staticUrl("/benchmark", B)).toBe(`${B}/benchmark.json`);
     expect(staticUrl("/ai/status", B)).toBe(`${B}/ai/status.json`);
     expect(staticUrl("/stocks/BRK.B/prices", B)).toBe(`${B}/stocks/BRK.B/prices.json`);
     expect(staticUrl("/stocks/AAPL/patterns?days=1300", B)).toBe(`${B}/stocks/AAPL/patterns.json`);

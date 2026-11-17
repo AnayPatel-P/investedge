@@ -60,6 +60,17 @@ def stock_prices(symbol: str) -> list[dict]:
     return rows
 
 
+@app.get("/api/benchmark")
+def benchmark() -> dict:
+    """Daily closes of the market proxy (SPY), for "how did this stock do vs. the S&P 500"."""
+    rows = _rows(
+        "SELECT date, close FROM prices WHERE symbol = ? ORDER BY date", [settings.benchmark]
+    )
+    if not rows:
+        raise HTTPException(404, "No benchmark data yet")
+    return {"symbol": settings.benchmark, "name": "S&P 500", "prices": rows}
+
+
 @app.get("/api/stocks/{symbol}/forecasts")
 def stock_forecasts(symbol: str) -> dict[str, list[dict]]:
     rows = _rows(

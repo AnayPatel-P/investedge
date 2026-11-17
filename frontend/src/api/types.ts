@@ -185,3 +185,14 @@ export interface Patterns {
   library: PatternInfo[];
   occurrences: PatternHit[];
 }
+
+export interface BenchmarkPoint {
+  date: string;
+  close: number;
+}
+
+export interface Benchmark {
+  symbol: string;
+  name: string;
+  prices: BenchmarkPoint[];
+}

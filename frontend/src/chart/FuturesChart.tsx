@@ -17,7 +17,7 @@ export type ChartMode = "candles" | "line";
 export type Range = "1M" | "6M" | "1Y" | "5Y";
 export type Phase = "idle" | "release" | "reality" | "done";
 
-const RANGE_BARS: Record<Range, number> = { "1M": 22, "6M": 126, "1Y": 252, "5Y": 1300 };
+export const RANGE_BARS: Record<Range, number> = { "1M": 22, "6M": 126, "1Y": 252, "5Y": 1300 };
 const TRAILS = 180;
 const RELEASE_MS = 1500;
 const REALITY_MS = 1300;
@@ -41,6 +41,8 @@ export interface FuturesChartProps {
   /** Candlestick pattern markers (candles mode only). */
   markers?: PatternHit[];
   onMarkerClick?: (date: string) => void;
+  /** S&P 500 closes already rebased to the stock's price (dashed comparison line). */
+  benchmark?: { date: string; value: number }[];
 }
 
 const toTime = (iso: string) => (Date.parse(`${iso}T00:00:00Z`) / 1000) as UTCTimestamp;
@@ -62,6 +64,7 @@ export function FuturesChart(props: FuturesChartProps) {
   const volRef = useRef<ISeriesApi<"Histogram"> | null>(null);
   const envHiRef = useRef<ISeriesApi<"Line"> | null>(null);
   const envLoRef = useRef<ISeriesApi<"Line"> | null>(null);
+  const benchRef = useRef<ISeriesApi<"Line"> | null>(null);
   const progress = useRef({ release: 1, reality: 1 });
   const propsRef = useRef(props);
   propsRef.current = props;
@@ -92,6 +95,14 @@ export function FuturesChart(props: FuturesChartProps) {
     const hidden = { color: "rgba(0,0,0,0)", lastValueVisible: false, priceLineVisible: false, crosshairMarkerVisible: false, lineWidth: 1 as const };
     envHiRef.current = chart.addLineSeries(hidden);
     envLoRef.current = chart.addLineSeries(hidden);
+    benchRef.current = chart.addLineSeries({
+      color: css("--muted"),
+      lineWidth: 2,
+      lineStyle: 2, // dashed: distinguishable from the price without relying on color
+      title: "S&P 500",
+      priceLineVisible: false,
+      crosshairMarkerVisible: false,
+    });
 
     const redraw = () => requestAnimationFrame(draw);
     chart.timeScale().subscribeVisibleLogicalRangeChange(redraw);
@@ -135,6 +146,7 @@ export function FuturesChart(props: FuturesChartProps) {
         rightPriceScale: { borderColor: css("--rule") },
         timeScale: { borderColor: css("--rule") },
       });
+      benchRef.current?.applyOptions({ color: css("--muted") });
       styleMain();
       requestAnimationFrame(draw);
     });
@@ -220,6 +232,11 @@ export function FuturesChart(props: FuturesChartProps) {
     requestAnimationFrame(draw);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [bars, mode, range, forecasts, focus, visibleModels, level, reality, replay]);
+
+  // S&P 500 comparison line.
+  useEffect(() => {
+    benchRef.current?.setData((props.benchmark ?? []).map((p) => ({ time: toTime(p.date), value: p.value })));
+  }, [props.benchmark]);
 
   // Pattern markers: teal ▲ below "bullish" candles, rust ▼ above "bearish", ink dot for neutral.
   useEffect(() => {

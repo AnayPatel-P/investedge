@@ -24,6 +24,10 @@ export const GLOSSARY = {
     term: "1-year return",
     def: "How much the price changed over the last 12 months (dividends not included). Past returns don't predict future ones.",
   },
+  benchmark: {
+    term: "Benchmark (S&P 500)",
+    def: "A yardstick to compare against. Here it's the S&P 500, the 500 large US companies together (tracked by the SPY fund). Beating it over a stretch of time can be luck; trailing it is common.",
+  },
   returnPerRisk: {
     term: "Return per unit of risk",
     def: "Last year's return divided by its volatility (a simple Sharpe ratio). It asks: how much did the ride pay for how bumpy it was?",

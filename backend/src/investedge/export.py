@@ -3,7 +3,7 @@
 The files are produced by calling the real FastAPI app in-process, so they are byte-for-byte the
 same shapes the live API returns. Layout (mirrors the API paths):
 
-    data/tickers.json, profiles.json, runs/latest.json, ai/status.json
+    data/tickers.json, profiles.json, benchmark.json, runs/latest.json, ai/status.json
     data/stocks/{SYMBOL}/{prices,forecasts,metrics,scorecard,backtest,patterns}.json
     data/screener/{profile}.json            (full ranked list; the browser filters sectors)
     data/example-portfolios/{profile}.json
@@ -73,6 +73,11 @@ def export(out: Path, workers: int = 8) -> dict:
     tickers = get("/tickers")
     sizes.append(_write(tmp / "tickers.json", tickers))
     sizes.append(_write(tmp / "profiles.json", get("/profiles")))
+    bench = get("/benchmark")
+    if bench is not None:
+        sizes.append(_write(tmp / "benchmark.json", bench))
+    else:
+        missing.append("benchmark")
     latest = get("/runs/latest")
     if latest is not None:
         sizes.append(_write(tmp / "runs" / "latest.json", latest))

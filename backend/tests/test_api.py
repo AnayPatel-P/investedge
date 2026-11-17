@@ -97,3 +97,29 @@ def test_summary_api_error_becomes_503(client, monkeypatch):
 
 def test_patterns_endpoint_404_for_unknown(client):
     assert client.get("/api/stocks/ZZZ/patterns").status_code == 404
+
+
+def test_benchmark_endpoint(client, tmp_path) -> None:
+    from investedge import storage
+
+    assert client.get("/api/benchmark").status_code == 404
+    px = pd.DataFrame(
+        {
+            "symbol": "SPY",
+            "date": [date(2026, 1, 2), date(2026, 1, 5)],
+            "open": 1.0,
+            "high": 1.0,
+            "low": 1.0,
+            "close": [500.0, 505.5],
+            "volume": 1,
+            "dividend": 0.0,
+        }
+    )
+    with storage.connect() as con:
+        storage.replace_rows(con, "prices", px, ["symbol", "date"])
+    body = client.get("/api/benchmark").json()
+    assert body["symbol"] == "SPY"
+    assert body["prices"] == [
+        {"date": "2026-01-02", "close": 500.0},
+        {"date": "2026-01-05", "close": 505.5},
+    ]

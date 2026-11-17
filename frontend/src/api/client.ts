@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import type {
   AiStatus,
   Backtest,
+  Benchmark,
   ChatEvent,
   ExamplePortfolio,
   Forecasts,
@@ -70,6 +71,8 @@ export const useForecasts = (s: string) => useQuery({ queryKey: ["forecasts", s]
 export const useBacktest = (s: string) => useQuery({ queryKey: ["backtest", s], queryFn: () => get<Backtest>(`/stocks/${sym(s)}/backtest`), ...opts });
 export const usePatterns = (s: string, enabled: boolean) =>
   useQuery({ queryKey: ["patterns", s], queryFn: () => get<Patterns>(`/stocks/${sym(s)}/patterns?days=1300`), enabled, ...opts });
+export const useBenchmark = (enabled: boolean) =>
+  useQuery({ queryKey: ["benchmark"], queryFn: () => get<Benchmark>("/benchmark"), enabled, ...opts });
 export const useMetrics = (s: string) => useQuery({ queryKey: ["metrics", s], queryFn: () => get<Metrics>(`/stocks/${sym(s)}/metrics`), ...opts });
 export const useScorecard = (s: string) => useQuery({ queryKey: ["scorecard", s], queryFn: () => get<Scorecard>(`/stocks/${sym(s)}/scorecard`), ...opts });
 

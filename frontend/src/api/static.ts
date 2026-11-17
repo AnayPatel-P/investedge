@@ -11,6 +11,7 @@ export function staticUrl(path: string, base = `${import.meta.env.BASE_URL}data`
   const fixed: Record<string, string> = {
     "/tickers": "/tickers.json",
     "/profiles": "/profiles.json",
+    "/benchmark": "/benchmark.json",
     "/runs/latest": "/runs/latest.json",
     "/ai/status": "/ai/status.json",
   };

@@ -265,3 +265,29 @@
   border-color: var(--forecast);
   color: var(--paper);
 }
+
+.market-toggle[aria-pressed="true"] {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
+.market-compare {
+  margin-top: 12px;
+  padding: 12px 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+.market-compare p {
+  margin: 0;
+}
+.market-figures {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 20px;
+}
+.market-note {
+  margin-top: 6px !important;
+  font-size: 0.85em;
+}

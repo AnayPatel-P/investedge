@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { ApiError, useBacktest, useForecasts, useMetrics, usePatterns, usePrices, useProfiles, useScorecard } from "../api/client";
+import { ApiError, useBacktest, useBenchmark, useForecasts, useMetrics, usePatterns, usePrices, useProfiles, useScorecard } from "../api/client";
 import type { ForecastPoint, ModelKey, PriceBar, Profile } from "../api/types";
-import { FuturesChart, type ChartMode, type Phase, type Range } from "../chart/FuturesChart";
+import { compareToBenchmark, rebaseBenchmark, type Comparison } from "../chart/benchmark";
+import { FuturesChart, RANGE_BARS, type ChartMode, type Phase, type Range } from "../chart/FuturesChart";
 import { Scrubber } from "../chart/Scrubber";
 import { tallyAll, tallyRun, type Tally } from "../chart/tally";
 import { bandAt } from "../chart/trails";
@@ -58,6 +59,8 @@ export function Stock() {
   const [showPatterns, setShowPatterns] = useState(false);
   const [pickedMarker, setPickedMarker] = useState<string | null>(null);
   const patterns = usePatterns(sym, showPatterns);
+  const [showMarket, setShowMarket] = useState(false);
+  const bench = useBenchmark(showMarket);
 
   // Re-apply profile defaults when the profile (or stock) changes.
   useEffect(() => {
@@ -100,6 +103,17 @@ export function Stock() {
     [replayOrigin, backtest.data, focus, level],
   );
   const totals = useMemo(() => (backtest.data?.origins.length ? tallyAll(backtest.data, focus, level) : null), [backtest.data, focus, level]);
+
+  // S&P 500 comparison, measured from the first bar of the chosen time range.
+  const marketStart = Math.max(0, (prices.data?.length ?? 0) - RANGE_BARS[range]);
+  const marketLine = useMemo(
+    () => (showMarket && !replayOrigin && bench.data && prices.data ? rebaseBenchmark(prices.data, bench.data.prices, marketStart) : undefined),
+    [showMarket, replayOrigin, bench.data, prices.data, marketStart],
+  );
+  const market = useMemo(
+    () => (showMarket && bench.data && prices.data ? compareToBenchmark(prices.data, bench.data.prices, marketStart) : null),
+    [showMarket, bench.data, prices.data, marketStart],
+  );
 
   const replay = (i: number) => {
     setStop(i === todayIndex ? null : i);
@@ -183,6 +197,15 @@ export function Stock() {
               >
                 {showPatterns ? "◆ Patterns on" : "◇ Patterns"}
               </button>
+              <button
+                type="button"
+                className="btn market-toggle"
+                aria-pressed={showMarket}
+                onClick={() => setShowMarket((v) => !v)}
+                title="Compare this stock with the S&P 500 over the chosen time range"
+              >
+                {showMarket ? "╌ vs S&P 500 on" : "╌ vs S&P 500"}
+              </button>
               <div className="segmented" role="group" aria-label="Time range">
                 {RANGES.map((r) => (
                   <button key={r} type="button" aria-pressed={range === r && !replayOrigin} disabled={!!replayOrigin} onClick={() => setRange(r)}>
@@ -258,9 +281,24 @@ export function Stock() {
               onHover={setHover}
               markers={showPatterns && !replayOrigin ? patterns.data?.occurrences : undefined}
               onMarkerClick={setPickedMarker}
+              benchmark={marketLine}
             />
           ) : (
             <div className="skeleton chart-skeleton" aria-hidden="true" />
+          )}
+
+          {showMarket && (
+            <div className="market-compare" aria-live="polite">
+              {replayOrigin ? (
+                <p className="muted">The S&amp;P 500 line is hidden while you rewind. Slide the timeline back to today to see it.</p>
+              ) : bench.isError ? (
+                <p className="muted">S&amp;P 500 data isn't available right now.</p>
+              ) : market ? (
+                <MarketReadout sym={sym} c={market} />
+              ) : (
+                <p className="muted">Loading the S&amp;P 500…</p>
+              )}
+            </div>
           )}
 
           {!terminal && !tooNew && endBand && (
@@ -406,5 +444,35 @@ function TallyCard({
         </>
       )}
     </div>
+  );
+}
+
+function MarketReadout({ sym, c }: { sym: string; c: Comparison }) {
+  const s = signedPct(c.stock);
+  const mk = signedPct(c.market);
+  const pts = Math.abs(c.diff * 100).toFixed(1);
+  const verdict =
+    Math.abs(c.diff) < 0.005
+      ? "About the same as the market."
+      : c.diff > 0
+        ? `${sym} did ${pts} points better than the market.`
+        : `${sym} did ${pts} points worse than the market.`;
+  return (
+    <>
+      <p className="market-figures">
+        <span className="kicker">Since {longDate(c.start)}</span>
+        <span>
+          {sym} <span className={`mono ${s.dir}`}>{s.text}</span>
+        </span>
+        <span>
+          <Term k="benchmark">S&amp;P 500</Term> <span className={`mono ${mk.dir}`}>{mk.text}</span>
+        </span>
+        <strong>{verdict}</strong>
+      </p>
+      <p className="market-note muted">
+        Dashed line: the S&amp;P 500 (via the SPY fund), scaled to start at {sym}'s price on that day, so you can see how the same money
+        would have done in the whole market. It's a look back, not a forecast.
+      </p>
+    </>
   );
 }
