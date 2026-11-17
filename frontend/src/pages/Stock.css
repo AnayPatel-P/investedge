@@ -291,3 +291,15 @@
   margin-top: 6px !important;
   font-size: 0.85em;
 }
+
+.mg-link {
+  margin-left: var(--s-2);
+  font-size: var(--step--1);
+  color: var(--muted);
+  text-decoration: underline dotted;
+  text-underline-offset: 3px;
+}
+.mg-link:hover,
+.mg-link:focus-visible {
+  color: var(--ink);
+}

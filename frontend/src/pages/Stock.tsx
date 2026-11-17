@@ -10,6 +10,8 @@ import { bandAt } from "../chart/trails";
 import { FitBadge, RiskMeter } from "../components/Badges";
 import { Dial } from "../components/Dial";
 import { MetricsLedger } from "../components/MetricsLedger";
+import { ModelGuide, describeLine } from "../components/ModelGuide";
+import { lineShape } from "../chart/lineShape";
 import { Term } from "../components/Term";
 import { PatternPanel } from "../components/PatternPanel";
 import { ScorecardPanel } from "../components/ScorecardPanel";
@@ -141,6 +143,7 @@ export function Stock() {
   const tooNew = forecasts.data && Object.keys(forecasts.data).length === 0;
   const focusPts = view.forecasts[focus] ?? [];
   const endBand = focusPts.length ? bandAt(focusPts[focusPts.length - 1], level) : null;
+  const focusShape = last && !replayOrigin ? lineShape(focusPts, last.close) : null;
   const terminal = density === "terminal";
   const shown = hover ?? last;
 
@@ -251,6 +254,20 @@ export function Stock() {
                   </span>
                 );
               })}
+              <a
+                className="mg-link"
+                href="#model-guide"
+                onClick={(e) => {
+                  e.preventDefault();
+                  const el = document.getElementById("model-guide") as HTMLDetailsElement | null;
+                  if (el) {
+                    el.open = true;
+                    el.scrollIntoView({ behavior: "smooth", block: "start" });
+                  }
+                }}
+              >
+                What are these?
+              </a>
             </div>
           </div>
 
@@ -314,7 +331,8 @@ export function Stock() {
                   <Term k="forecastRange">{level}% range</Term> says that by{" "}
                   <strong>{shortDate(focusPts[focusPts.length - 1].date)}</strong> the price should land between{" "}
                   <strong className="num">{price(endBand.lo)}</strong> and <strong className="num">{price(endBand.hi)}</strong>{" "}
-                  {level} times out of 100 — if the model is honest. The scorecard below checks that.
+                  {level} times out of 100 — if the model is honest. The scorecard checks that.
+                  {focusShape && last && <> {describeLine(focus, focusShape, last.close)}</>}
                 </>
               )}
             </p>
@@ -358,6 +376,24 @@ export function Stock() {
             </div>
           )}
           {showPatterns && patterns.isLoading && <div className="skeleton" style={{ height: 200, marginTop: 24 }} aria-hidden="true" />}
+
+          {!tooNew && last && forecasts.data && (
+            <ModelGuide
+              key={density}
+              sym={sym}
+              lastClose={last.close}
+              forecasts={forecasts.data}
+              scorecard={scorecard.data}
+              focus={focus}
+              defaultOpen={!terminal}
+              onShow={(mk) => {
+                setFocus(mk);
+                setStop(null);
+                setReleaseKey((k) => k + 1);
+                document.querySelector(".stock-chart")?.scrollIntoView({ behavior: "smooth", block: "start" });
+              }}
+            />
+          )}
         </section>
 
         {/* ------------------------------------------------ side: confidence dial, scorecard, metrics */}
