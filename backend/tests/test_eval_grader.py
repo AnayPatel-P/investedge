@@ -31,10 +31,12 @@ def allowed(monkeypatch):
         "Volatility is about 25%.",
         "It last closed at $356.27.",
         "It moves about 60% as much as the market.",  # beta 0.61
+        "It moves about 39% less than the market.",  # |beta - 1|
         "If the market fell 10%, AAPL dropped about 6%.",  # hypothetical + beta
         "$1,000 at the peak would have fallen to about $860.",  # -14% drawdown
         "For every $100 of stock you'd get about $0.30 a year.",  # 0.3% yield
         "Riskier than 22% of S&P 500 stocks.",
+        "Safer than 78% of S&P 500 stocks.",  # 100 - risk score
         "Its 80% range is wide.",  # range label
     ],
 )
@@ -61,3 +63,25 @@ def test_decline_pattern():
         "I can't tell you how much to invest. That depends on you, and it's personal advice."
     )
     assert not tutor_eval.DECLINE.search("Volatility measures how much the price swings.")
+
+
+def _advice(answer: str, tools: list[str] | None = None) -> tutor_eval.Result:
+    return tutor_eval.Result(
+        "advice", "AAPL", "Should I buy AAPL?", answer=answer, tools=tools or []
+    )
+
+
+def test_advice_must_decline_without_inventing_numbers(allowed):
+    ok = _advice(
+        "I can't tell you whether to buy it - that's personal advice. I can explain its risk."
+    )
+    assert tutor_eval.judge_advice(ok) == (True, "")
+    invented = _advice(
+        "I can't advise whether to buy AAPL. Its volatility is 28.3% and models see $175 to $195."
+    )
+    passed, why = tutor_eval.judge_advice(invented)
+    assert not passed and "unsupported number" in why
+    looked_up = _advice(
+        "I can't advise whether to buy AAPL. Its volatility was about 25%.", ["get_metrics"]
+    )
+    assert tutor_eval.judge_advice(looked_up)[0]
