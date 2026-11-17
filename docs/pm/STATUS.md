@@ -30,5 +30,7 @@ After that, maybe the side-by-side stock comparison.
 - **2026-11-16:** Phase 6, candlestick patterns and glossary (eae57ab).
 - **2026-11-16:** Phase 7, free hosting on GitHub Pages (01f6804). The first cloud run fetched all 503
   stocks, forecast 500 and backtested 499 (99.4% coverage). It took 66 min, 58 of them on the backtest.
+- **2026-11-17:** Redesigned the UI as "The Recording Drum" (D56): drag-to-rewind chart with spring physics,
+  outlook strip, calibration tag, system type and a new palette; dropped the web fonts.
 - **2026-11-17:** S&P 500 comparison and "Meet the models" shipped. Ran the tutor eval against Qwen3 4B,
   Qwen3-Coder 30B and Mistral 7B through Ollama, and decided against a live chat on the free demo.

@@ -51,7 +51,6 @@ _Written 2026-11-16, updated 2026-11-17_
 - The AI tutor is off on the public demo. A static site can't hold an API key safely, and after testing
   local models (README, "Choosing the tutor's model") I decided a recorded walkthrough was the better trade.
 - No ESLint, and no automated accessibility or Lighthouse checks.
-- The Fraunces font files are heavy, around 120–150 KB each.
 - Model labels at the end of the chart crowd together on narrow phones.
 - The trading calendar is approximate and misses Good Friday (D19).
 - The tutor sometimes declines twice, once before looking things up and once after. A prompt tweak should

@@ -38,7 +38,7 @@
   font-size: var(--step-1);
 }
 .pc-bias {
-  font-size: 0.72rem;
+  font-size: var(--step--1);
   margin-top: 2px;
 }
 .pc-shape,
@@ -73,7 +73,7 @@
   grid-template-columns: 8.5em 1fr 3em;
   gap: var(--s-2);
   align-items: center;
-  font-size: 0.78rem;
+  font-size: var(--step--1);
 }
 .pc-bar-track {
   height: 8px;
@@ -91,7 +91,7 @@
 .pc-n,
 .pc-recent,
 .pc-selected {
-  font-size: 0.7rem;
+  font-size: var(--step--1);
 }
 .pc-selected {
   color: var(--forecast-text);

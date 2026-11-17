@@ -7,6 +7,7 @@
 }
 
 html {
+  font-size: 100%; /* respect the reader's text size */
   -webkit-text-size-adjust: 100%;
 }
 
@@ -16,29 +17,16 @@ body {
   color: var(--ink);
   font-family: var(--font-body);
   font-size: var(--step-0);
-  line-height: 1.55;
-  font-feature-settings: "tnum" 0;
-  transition: background var(--t-mid) var(--ease-out), color var(--t-mid) var(--ease-out);
+  line-height: var(--lh-0);
+  letter-spacing: var(--tr-0);
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  /* density switch cross-fades instead of snapping (craft §4) */
+  transition: background-color var(--t-slow) var(--ease-out), color var(--t-slow) var(--ease-out);
   overflow-x: hidden;
 }
 
-/* almanac paper grain: an SVG noise tile, very faint */
-body::before {
-  content: "";
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 0;
-  opacity: 0.35;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.12 0 0 0 0 0.16 0 0 0 0 0.19 0 0 0 0.05 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-}
-:root[data-density="terminal"] body::before {
-  opacity: 0.12;
-}
-
 #root {
-  position: relative;
-  z-index: 1;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
@@ -48,23 +36,29 @@ h1,
 h2,
 h3 {
   font-family: var(--font-display);
-  font-weight: 560;
-  font-variation-settings: "opsz" 96, "SOFT" 40;
-  letter-spacing: -0.015em;
-  line-height: 1.08;
+  font-weight: 650;
   margin: 0;
+  text-wrap: balance;
 }
 h1 {
   font-size: var(--step-3);
+  line-height: var(--lh-3);
+  letter-spacing: var(--tr-3);
 }
 h2 {
   font-size: var(--step-2);
+  line-height: var(--lh-2);
+  letter-spacing: var(--tr-2);
 }
 h3 {
   font-size: var(--step-1);
+  line-height: var(--lh-1);
+  letter-spacing: var(--tr-1);
+  font-weight: 600;
 }
 p {
   margin: 0;
+  text-wrap: pretty;
 }
 
 a {
@@ -85,27 +79,29 @@ a:hover {
 button {
   font: inherit;
   color: inherit;
+  -webkit-tap-highlight-color: transparent;
 }
 
+/* figures: the system face with tabular numbers, so columns line up and live values don't jitter */
 .num,
 .mono {
-  font-family: var(--font-mono);
-  font-feature-settings: "tnum" 1, "zero" 1;
-  letter-spacing: -0.01em;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
 }
 
+/* small label above a value or section */
 .kicker {
-  font-family: var(--font-mono);
   font-size: var(--step--1);
+  line-height: var(--lh--1);
+  font-weight: 600;
   text-transform: uppercase;
-  letter-spacing: 0.12em;
+  letter-spacing: var(--label-tracking);
   color: var(--muted);
 }
 
 .muted {
   color: var(--muted);
 }
-
 .up {
   color: var(--up);
 }
@@ -124,7 +120,7 @@ button {
 
 .page {
   width: 100%;
-  max-width: 1320px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: 0 var(--gutter) var(--s-8);
   flex: 1;
@@ -136,26 +132,34 @@ button {
   margin: 0;
 }
 
-/* buttons: printed-label style, not pills */
+/* ---- buttons: react on pointer-down (craft §5), commit on release */
 .btn {
   display: inline-flex;
   align-items: center;
   gap: var(--s-2);
-  padding: 0.55em 1em;
+  min-height: 2.25rem;
+  padding: 0 0.9em;
   border: var(--hairline-strong);
   background: var(--surface);
   border-radius: var(--radius-1);
   cursor: pointer;
   font-size: var(--step--1);
-  font-family: var(--font-mono);
-  letter-spacing: 0.04em;
-  transition: background var(--t-fast), border-color var(--t-fast), transform var(--t-fast);
+  font-weight: 550;
+  letter-spacing: var(--tr--1);
+  transition:
+    background-color var(--t-fast) var(--ease-out),
+    border-color var(--t-fast) var(--ease-out),
+    transform var(--t-press) var(--ease-out);
 }
 .btn:hover {
-  border-color: var(--ink);
+  border-color: var(--ink-soft);
 }
-.btn:active {
-  transform: translateY(1px);
+.btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 .btn[aria-pressed="true"],
 .btn.primary {
@@ -164,38 +168,59 @@ button {
   border-color: var(--ink);
 }
 
+/* segmented control: the familiar pattern, untouched in behavior */
 .segmented {
   display: inline-flex;
-  border: var(--hairline-strong);
-  border-radius: var(--radius-1);
-  overflow: hidden;
+  padding: 2px;
+  gap: 2px;
+  background: var(--paper-deep);
+  border-radius: calc(var(--radius-1) + 2px);
 }
 .segmented button {
   border: 0;
-  border-right: var(--hairline);
+  border-radius: var(--radius-1);
   background: transparent;
-  padding: 0.4em 0.8em;
+  min-height: 2rem;
+  padding: 0 0.75em;
   cursor: pointer;
-  font-family: var(--font-mono);
   font-size: var(--step--1);
+  font-weight: 550;
+  color: var(--ink-soft);
+  font-variant-numeric: tabular-nums;
+  transition:
+    background-color var(--t-fast) var(--ease-out),
+    color var(--t-fast) var(--ease-out),
+    transform var(--t-press) var(--ease-out);
 }
-.segmented button:last-child {
-  border-right: 0;
+.segmented button:active:not(:disabled) {
+  transform: scale(0.96);
 }
 .segmented button[aria-pressed="true"] {
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--surface-2);
+  color: var(--ink);
+  box-shadow: 0 1px 2px rgba(26, 34, 48, 0.12);
+}
+:root[data-density="terminal"] .segmented button[aria-pressed="true"] {
+  background: var(--rule-strong);
+  box-shadow: none;
+}
+.segmented button:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
 }
 
+/* loading: a still, recessed placeholder that breathes once a second, never a sweeping shimmer */
 .skeleton {
-  background: linear-gradient(90deg, var(--paper-deep), var(--surface), var(--paper-deep));
-  background-size: 200% 100%;
-  animation: shimmer 1.6s linear infinite;
-  border-radius: var(--radius-1);
+  background: var(--paper-deep);
+  border-radius: var(--radius-2);
+  animation: breathe 1.4s var(--ease-out) infinite alternate;
 }
-@keyframes shimmer {
+@keyframes breathe {
+  from {
+    opacity: 1;
+  }
   to {
-    background-position: -200% 0;
+    opacity: 0.55;
   }
 }
 @media (prefers-reduced-motion: reduce) {

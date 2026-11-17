@@ -5,11 +5,14 @@
   border-bottom: var(--hairline-strong);
 }
 .pf-title {
-  font-size: var(--step-4);
-  font-weight: 460;
-  letter-spacing: -0.035em;
-  line-height: 0.95;
-  max-width: 16ch;
+  font-size: var(--step-3);
+  line-height: var(--lh-3);
+  letter-spacing: var(--tr-3);
+  font-weight: 700;
+  max-width: 20ch;
+}
+.pf-head .segmented {
+  justify-self: start;
 }
 .pf-lede {
   max-width: 58ch;
@@ -110,10 +113,10 @@
   font-size: var(--step--1);
 }
 .pf-name .muted {
-  font-size: 0.75rem;
+  font-size: var(--step--1);
 }
 .pf-weight {
-  font-size: 0.85rem;
+  font-size: var(--step--1);
 }
 .pf-stats {
   display: flex;

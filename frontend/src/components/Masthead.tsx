@@ -14,7 +14,7 @@ export function Masthead() {
       <div className="masthead-inner">
         <Link to="/" className="wordmark" aria-label="InvestEdge home">
           <span className="wordmark-name">InvestEdge</span>
-          <span className="wordmark-tag">an almanac of possible futures</span>
+          <span className="wordmark-tag">every forecast, checked against reality</span>
         </Link>
         <nav className="masthead-nav" aria-label="Main">
           <NavLink to="/" end>

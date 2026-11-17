@@ -6,15 +6,14 @@
 }
 .picker-title {
   font-size: var(--step-4);
-  font-weight: 480;
-  font-variation-settings: "opsz" 144, "SOFT" 60;
-  letter-spacing: -0.035em;
-  line-height: 0.95;
+  line-height: var(--lh-4);
+  letter-spacing: var(--tr-4);
+  font-weight: 650;
   max-width: 14ch;
 }
 .picker-title em {
-  font-style: italic;
-  color: var(--forecast-text);
+  font-style: normal;
+  color: var(--reality);
 }
 .picker-lede {
   font-size: var(--step-1);

@@ -1,80 +1,91 @@
-.scrubber {
-  display: grid;
-  gap: var(--s-2);
+/* The drum's ruler. No CSS transitions on position: the thumb follows the pen's spring. */
+.ruler {
   user-select: none;
+  -webkit-user-select: none;
+  padding: 0 var(--s-2);
 }
-.scrubber.disabled {
-  opacity: 0.5;
+.ruler.disabled {
+  opacity: 0.45;
 }
-.scrubber-track {
+.ruler-track {
   position: relative;
-  height: 44px;
+  height: 52px;
   cursor: pointer;
   touch-action: none;
 }
-.scrubber-line {
+.ruler-line {
   position: absolute;
   left: 0;
   right: 0;
-  top: 50%;
+  top: 14px;
   height: 1px;
   background: var(--rule-strong);
 }
-.scrubber-past {
+.ruler-past {
   position: absolute;
   left: 0;
-  top: calc(50% - 1px);
+  top: 13px;
   height: 3px;
-  background: var(--forecast);
-  transition: width var(--t-mid) var(--ease-detent);
+  border-radius: 2px;
+  background: color-mix(in srgb, var(--reality) 35%, transparent);
 }
-.scrubber-notch {
+.ruler-tick {
   position: absolute;
-  top: calc(50% - 8px);
+  top: 8px;
   width: 1px;
-  height: 16px;
+  height: 13px;
+  background: var(--rule-strong);
+}
+.ruler-tick.on {
+  background: var(--reality);
+}
+.ruler-tick.today {
+  width: 2px;
+  margin-left: -1px;
+  height: 17px;
+  top: 6px;
   background: var(--ink);
 }
-.scrubber-notch.today {
-  width: 3px;
-  margin-left: -1px;
-  height: 22px;
-  top: calc(50% - 11px);
-}
-.scrubber-thumb {
+.ruler-label {
   position: absolute;
-  top: 50%;
-  width: 22px;
-  height: 22px;
-  margin: -11px 0 0 -11px;
-  border-radius: 50%;
-  background: var(--surface);
-  border: 2px solid var(--ink);
-  box-shadow: 0 6px 14px -6px rgba(31, 42, 48, 0.5);
-  transition: left var(--t-mid) var(--ease-detent);
+  top: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.6875rem; /* 11px */
+  font-weight: 550;
+  letter-spacing: var(--tr--1);
+  color: var(--muted);
+  white-space: nowrap;
 }
-.scrubber-thumb::after {
-  content: "";
+.ruler-tick.on .ruler-label,
+.ruler-tick.today .ruler-label {
+  color: var(--ink);
+}
+.ruler-thumb {
   position: absolute;
-  inset: 5px;
+  top: 14px;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
   border-radius: 50%;
-  background: var(--forecast);
+  background: var(--surface-2);
+  border: 2px solid var(--reality);
+  box-shadow: var(--lift);
+  transition: transform var(--t-press) var(--ease-out);
 }
-.scrubber-thumb.dragging {
-  transition: none;
-  transform: scale(1.12);
+/* pressed state shows on pointer-down */
+.ruler-thumb.dragging {
+  transform: scale(1.15);
 }
-.scrubber-track:focus-visible .scrubber-thumb {
+.ruler-track:focus-visible {
+  outline: none;
+}
+.ruler-track:focus-visible .ruler-thumb {
   outline: 2px solid var(--focus);
   outline-offset: 3px;
 }
-.scrubber-scale {
-  display: flex;
-  justify-content: space-between;
-  font-size: 0.72rem;
-  color: var(--muted);
-}
-.scrubber-scale span:nth-child(2) {
-  color: var(--ink);
-  font-weight: 600;
+@media (max-width: 520px) {
+  .ruler-label {
+    font-size: 0.625rem;
+  }
 }

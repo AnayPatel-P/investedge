@@ -1,51 +1,70 @@
-import { useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
+import { forwardRef, useImperativeHandle, useRef, useState, type KeyboardEvent, type PointerEvent } from "react";
 import { shortDate } from "../format";
 import "./Scrubber.css";
 
 interface Props {
   /** Past origins (oldest first). The last stop is always "Today". */
   origins: string[];
-  /** Index into [...origins, "today"]. */
+  /** Committed index into [...origins, "today"]. */
   value: number;
   onChange: (index: number) => void;
   disabled?: boolean;
 }
 
-/** Timeline with detents at each backtest origin (Rewind & Release). Drag, click, or arrow keys. */
-export function Scrubber({ origins, value, onChange, disabled }: Props) {
+export interface RulerHandle {
+  /** Follow the drum's pen while it turns (stop units, fractional). No React render. */
+  setPen: (pos: number) => void;
+}
+
+const month = (iso: string) => new Date(`${iso}T00:00:00Z`).toLocaleDateString("en-US", { month: "short", timeZone: "UTC" });
+
+/**
+ * The drum's ruler: one tick per monthly forecast date, plus today. It is the accessible way to
+ * turn the drum (click a tick, drag, arrow keys) and it tracks the pen while the drum spins.
+ */
+export const Scrubber = forwardRef<RulerHandle, Props>(function Scrubber({ origins, value, onChange, disabled }, ref) {
   const stops = [...origins, "today"];
   const trackRef = useRef<HTMLDivElement>(null);
-  const [dragX, setDragX] = useState<number | null>(null);
-  const pos = (i: number) => (stops.length > 1 ? (i / (stops.length - 1)) * 100 : 100);
+  const thumbRef = useRef<HTMLSpanElement>(null);
+  const pastRef = useRef<HTMLSpanElement>(null);
+  const [dragging, setDragging] = useState(false);
+  const draggingRef = useRef(false);
+  const pct = (i: number) => (stops.length > 1 ? (i / (stops.length - 1)) * 100 : 100);
 
-  const indexAt = (clientX: number) => {
+  const place = (p: number) => {
+    if (thumbRef.current) thumbRef.current.style.left = `${p}%`;
+    if (pastRef.current) pastRef.current.style.width = `${p}%`;
+  };
+  useImperativeHandle(ref, () => ({
+    setPen: (pos) => {
+      if (!draggingRef.current) place(pct(pos));
+    },
+  }));
+
+  const at = (clientX: number) => {
     const r = trackRef.current!.getBoundingClientRect();
     const f = Math.min(1, Math.max(0, (clientX - r.left) / r.width));
-    return { i: Math.round(f * (stops.length - 1)), pct: f * 100 };
+    return { i: Math.round(f * (stops.length - 1)), p: f * 100 };
   };
   const onDown = (e: PointerEvent<HTMLDivElement>) => {
     if (disabled) return;
     e.currentTarget.setPointerCapture(e.pointerId);
-    setDragX(indexAt(e.clientX).pct);
+    draggingRef.current = true;
+    setDragging(true);
+    place(at(e.clientX).p);
   };
   const onMove = (e: PointerEvent<HTMLDivElement>) => {
-    if (dragX === null) return;
-    setDragX(indexAt(e.clientX).pct);
+    if (draggingRef.current) place(at(e.clientX).p);
   };
-  const onUp = (e: PointerEvent<HTMLDivElement>) => {
-    if (dragX === null) return;
-    setDragX(null);
-    const { i } = indexAt(e.clientX);
-    if (i !== value) onChange(i);
-  };
-  const onLost = () => {
-    if (dragX === null) return; // pointerup already handled it
-    const i = Math.round((dragX / 100) * (stops.length - 1));
-    setDragX(null);
-    if (i !== value) onChange(i);
+  const end = (e: PointerEvent<HTMLDivElement>, commit: boolean) => {
+    if (!draggingRef.current) return;
+    draggingRef.current = false;
+    setDragging(false);
+    const { i } = at(e.clientX);
+    if (commit && i !== value) onChange(i);
+    else place(pct(value));
   };
   const onKey = (e: KeyboardEvent) => {
-    setDragX(null);
     const d = e.key === "ArrowLeft" ? -1 : e.key === "ArrowRight" ? 1 : 0;
     if (d) {
       e.preventDefault();
@@ -57,14 +76,15 @@ export function Scrubber({ origins, value, onChange, disabled }: Props) {
   };
 
   const current = stops[value];
+  const labelEvery = stops.length > 9 ? 2 : 1;
   return (
-    <div className={`scrubber${disabled ? " disabled" : ""}`}>
+    <div className={`ruler${disabled ? " disabled" : ""}`}>
       <div
         ref={trackRef}
-        className="scrubber-track"
+        className="ruler-track"
         role="slider"
         tabIndex={disabled ? -1 : 0}
-        aria-label="Rewind to a past forecast date"
+        aria-label="Turn the chart back to a past forecast date"
         aria-valuemin={0}
         aria-valuemax={stops.length - 1}
         aria-valuenow={value}
@@ -72,27 +92,23 @@ export function Scrubber({ origins, value, onChange, disabled }: Props) {
         aria-disabled={disabled}
         onPointerDown={onDown}
         onPointerMove={onMove}
-        onPointerUp={onUp}
-        onPointerCancel={() => setDragX(null)}
-        onLostPointerCapture={onLost}
+        onPointerUp={(e) => end(e, true)}
+        onPointerCancel={(e) => end(e, false)}
         onKeyDown={onKey}
       >
-        <span className="scrubber-line" />
-        <span className="scrubber-past" style={{ width: `${dragX ?? pos(value)}%` }} />
+        <span className="ruler-line" />
+        <span ref={pastRef} className="ruler-past" style={{ width: `${pct(value)}%` }} />
         {stops.map((s, i) => (
-          <span
-            key={s}
-            className={`scrubber-notch${i === value ? " on" : ""}${s === "today" ? " today" : ""}`}
-            style={{ left: `${pos(i)}%` }}
-          />
+          <span key={s} className={`ruler-tick${i === value ? " on" : ""}${s === "today" ? " today" : ""}`} style={{ left: `${pct(i)}%` }}>
+            {(i % labelEvery === (stops.length - 1) % labelEvery || s === "today") && (
+              <span className="ruler-label" aria-hidden="true">
+                {s === "today" ? "Today" : month(s)}
+              </span>
+            )}
+          </span>
         ))}
-        <span className={`scrubber-thumb${dragX !== null ? " dragging" : ""}`} style={{ left: `${dragX ?? pos(value)}%` }} />
-      </div>
-      <div className="scrubber-scale mono" aria-hidden="true">
-        <span>{origins[0] ? shortDate(origins[0]) : ""}</span>
-        <span>{current === "today" ? "Today" : shortDate(current)}</span>
-        <span>Today</span>
+        <span ref={thumbRef} className={`ruler-thumb${dragging ? " dragging" : ""}`} style={{ left: `${pct(value)}%` }} />
       </div>
     </div>
   );
-}
+});

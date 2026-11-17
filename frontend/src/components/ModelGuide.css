@@ -1,13 +1,13 @@
 .model-guide {
-  margin-top: var(--s-5);
-  border-top: var(--hairline);
+  margin-top: var(--section-gap);
+  border-top: var(--hairline-strong);
 }
 .model-guide > summary {
   display: flex;
   flex-wrap: wrap;
   align-items: baseline;
   gap: var(--s-2) var(--s-3);
-  padding: var(--s-3) 0;
+  padding: var(--s-4) 0;
   cursor: pointer;
   list-style: none;
 }
@@ -15,86 +15,136 @@
   display: none;
 }
 .model-guide > summary::before {
-  content: "▸";
+  content: "›";
+  display: inline-block;
+  width: 0.8em;
+  font-weight: 700;
   color: var(--muted);
-  transition: transform var(--t-fast, 120ms) var(--ease-out, ease-out);
+  transition: transform var(--t-fast) var(--ease-out);
 }
 .model-guide[open] > summary::before {
   transform: rotate(90deg);
 }
 .mg-summary {
-  font-family: var(--font-display);
   font-size: var(--step-1);
+  line-height: var(--lh-1);
+  letter-spacing: var(--tr-1);
+  font-weight: 600;
 }
 .mg-lede {
-  max-width: 70ch;
+  max-width: var(--measure);
   margin: 0 0 var(--s-4);
   font-size: var(--step--1);
+  line-height: var(--lh--1);
+  color: var(--ink-soft);
 }
-.mg-grid {
+
+/* five models side by side: one row of tabs, never a wrapped grid */
+.mg-tabs {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
-  gap: 0 var(--s-5);
-}
-.mg-card {
-  display: grid;
-  gap: var(--s-2);
-  align-content: start;
-  padding: var(--s-4) 0;
-  border-top: var(--hairline);
-}
-.mg-card.focus {
-  box-shadow: inset 3px 0 0 var(--forecast);
-  padding-left: var(--s-3);
-}
-.mg-head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: var(--s-2);
 }
-.mg-head h3 {
-  margin: 0;
-  font-size: var(--step-1);
+.mg-tab {
+  display: grid;
+  gap: 2px;
+  text-align: left;
+  padding: var(--s-3);
+  border: 0;
+  border-radius: var(--radius-2);
+  background: transparent;
+  box-shadow: inset 0 0 0 1px var(--rule);
+  cursor: pointer;
+  transition:
+    background-color var(--t-fast) var(--ease-out),
+    box-shadow var(--t-fast) var(--ease-out),
+    transform var(--t-press) var(--ease-out);
 }
-.mg-nick {
-  font-style: italic;
+.mg-tab:active {
+  transform: scale(0.98);
+}
+.mg-tab[aria-selected="true"] {
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1.5px var(--ink);
+}
+.mg-tab-name {
+  font-weight: 650;
+}
+.mg-tab-nick {
+  font-size: var(--step--1);
+  line-height: var(--lh--1);
   color: var(--muted);
 }
+.mg-tab-drawn {
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--forecast-text);
+}
+.mg-tab-drawn::before {
+  content: "● ";
+}
+
+.mg-panel {
+  display: grid;
+  grid-template-columns: minmax(0, 1.6fr) minmax(0, 1fr);
+  gap: var(--s-6);
+  padding: var(--s-5) 0 var(--s-2);
+}
 .mg-analogy {
-  margin: 0;
-  font-family: var(--font-display);
-  font-style: italic;
+  font-size: var(--step-1);
+  line-height: var(--lh-1);
+  letter-spacing: var(--tr-1);
+  margin-bottom: var(--s-4);
 }
 .mg-facts {
   display: grid;
-  gap: 2px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--s-4) var(--s-5);
   margin: 0;
   font-size: var(--step--1);
+  line-height: var(--lh--1);
 }
 .mg-facts dt {
-  margin-top: var(--s-2);
-  font-family: var(--font-mono);
-  font-size: 0.78em;
-  letter-spacing: 0.08em;
+  font-size: var(--step--1);
+  font-weight: 600;
+  letter-spacing: var(--label-tracking);
   text-transform: uppercase;
   color: var(--muted);
+  margin-bottom: var(--s-1);
 }
 .mg-facts dd {
   margin: 0;
 }
 .mg-live {
-  margin-top: var(--s-2);
-  padding: var(--s-3);
-  background: color-mix(in srgb, var(--forecast) 8%, transparent);
+  align-self: start;
+  display: grid;
+  gap: var(--s-2);
+  padding: var(--s-4);
+  border-radius: var(--radius-2);
+  background: var(--surface);
+  box-shadow: inset 0 0 0 1px var(--rule);
   font-size: var(--step--1);
-}
-.mg-live p {
-  margin: 0;
-}
-.mg-live p + p {
-  margin-top: var(--s-1, 4px);
+  line-height: var(--lh--1);
 }
 .mg-show {
   justify-self: start;
+  margin-top: var(--s-2);
+}
+
+@media (max-width: 860px) {
+  .mg-tabs {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(9.5rem, 1fr);
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    padding-bottom: var(--s-1);
+  }
+  .mg-tab {
+    scroll-snap-align: start;
+  }
+  .mg-panel,
+  .mg-facts {
+    grid-template-columns: 1fr;
+  }
 }

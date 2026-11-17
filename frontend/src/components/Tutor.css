@@ -30,7 +30,6 @@
   font-size: var(--step-1);
   line-height: 1.5;
   max-width: 62ch;
-  font-variation-settings: "opsz" 24;
 }
 .briefing-text p {
   margin: 0 0 0.6em;
@@ -89,7 +88,6 @@
 }
 .turn.user .turn-text {
   font-family: var(--font-display);
-  font-style: italic;
   font-size: var(--step-1);
 }
 .turn.assistant .turn-text {
@@ -119,12 +117,11 @@
   display: flex;
   flex-wrap: wrap;
   gap: 4px var(--s-3);
-  font-size: 0.72rem;
+  font-size: var(--step--1);
   color: var(--muted);
   margin-bottom: 4px;
 }
 .thinking {
-  font-style: italic;
   animation: breathe 1.6s ease-in-out infinite;
 }
 @keyframes breathe {

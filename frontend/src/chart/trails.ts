@@ -81,3 +81,9 @@ export function landedInside(points: (ForecastPoint & { actual: number })[], lev
 }
 
 export const easeOut = (t: number) => 1 - Math.pow(1 - Math.min(1, Math.max(0, t)), 3);
+
+/** The possible futures the chart draws for a forecast. Shared so the outlook counts the same paths. */
+export const FUTURES = 180;
+export function futurePaths(points: ForecastPoint[]): number[][] {
+  return points.length ? samplePaths(points, FUTURES, points.length * 31 + Math.round(points[0].mean)) : [];
+}

@@ -4,7 +4,7 @@ import type { GlossaryKey } from "../glossary";
 import { Term } from "./Term";
 import "./MetricsLedger.css";
 
-/** Almanac-style ledger: number, then what it means, in plain English. */
+/** Ledger: number, then what it means, in plain English. */
 export function MetricsLedger({ m, compact = false }: { m: Metrics; compact?: boolean }) {
   const r1y = signedPct(m.return_1y);
   const beta = m.beta_1y;

@@ -77,7 +77,7 @@ export function ScorecardPanel({ card, compact = false }: { card: Scorecard; com
         <p className="score-explain muted">
           Each replay rewinds to a past date, lets the model see only the prices up to then, and checks its next 30 trading days
           against what really happened. “Naive guess” simply says the price stays put — if a model can't beat that, its
-          forecast line isn't telling you much. Try it yourself with the rewind dial above the chart.
+          forecast line isn't telling you much. Try it yourself: drag the chart above sideways to turn back time.
         </p>
       )}
     </section>

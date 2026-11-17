@@ -1,15 +1,16 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { ApiError, useBacktest, useBenchmark, useForecasts, useMetrics, usePatterns, usePrices, useProfiles, useScorecard } from "../api/client";
 import type { ForecastPoint, ModelKey, PriceBar, Profile } from "../api/types";
 import { compareToBenchmark, rebaseBenchmark, type Comparison } from "../chart/benchmark";
 import { FuturesChart, RANGE_BARS, type ChartMode, type Phase, type Range } from "../chart/FuturesChart";
-import { Scrubber } from "../chart/Scrubber";
+import { Scrubber, type RulerHandle } from "../chart/Scrubber";
+import { outlook } from "../chart/outlook";
 import { tallyAll, tallyRun, type Tally } from "../chart/tally";
-import { bandAt } from "../chart/trails";
+import { bandAt, futurePaths } from "../chart/trails";
 import { FitBadge, RiskMeter } from "../components/Badges";
-import { Dial } from "../components/Dial";
 import { MetricsLedger } from "../components/MetricsLedger";
+import { Outlook } from "../components/Outlook";
 import { ModelGuide, describeLine } from "../components/ModelGuide";
 import { lineShape } from "../chart/lineShape";
 import { Term } from "../components/Term";
@@ -21,11 +22,7 @@ import { usePrefs } from "../state/prefs";
 import "./Stock.css";
 
 const MODELS: ModelKey[] = ["naive", "arima", "ets", "prophet", "garch"];
-const LEVELS = [
-  { value: 50, label: "50% range", short: "50" },
-  { value: 80, label: "80% range", short: "80" },
-  { value: 95, label: "95% range", short: "95" },
-];
+const LEVELS = [50, 80, 95];
 const RANGES: Range[] = ["1M", "6M", "1Y", "5Y"];
 
 function defaultsFor(profile: Profile | undefined) {
@@ -62,6 +59,7 @@ export function Stock() {
   const [pickedMarker, setPickedMarker] = useState<string | null>(null);
   const patterns = usePatterns(sym, showPatterns);
   const [showMarket, setShowMarket] = useState(false);
+  const rulerRef = useRef<RulerHandle>(null);
   const bench = useBenchmark(showMarket);
 
   // Re-apply profile defaults when the profile (or stock) changes.
@@ -87,14 +85,15 @@ export function Stock() {
   const view = useMemo(() => {
     const bars = prices.data ?? [];
     if (!replayOrigin || !backtest.data) {
-      return { bars, forecasts: forecasts.data ?? {}, reality: undefined as { date: string; close: number }[] | undefined };
+      return { start: bars[bars.length - 1]?.close ?? 0, forecasts: forecasts.data ?? {}, reality: undefined as { date: string; close: number }[] | undefined };
     }
     const run = backtest.data.runs[replayOrigin] ?? {};
     const fc: Partial<Record<ModelKey, ForecastPoint[]>> = {};
     for (const [m, pts] of Object.entries(run)) fc[m as ModelKey] = pts ?? [];
     const anyRun = Object.values(run)[0] ?? [];
+    const before = bars.filter((b) => b.date <= replayOrigin);
     return {
-      bars: bars.filter((b) => b.date <= replayOrigin),
+      start: before[before.length - 1]?.close ?? 0,
       forecasts: fc,
       reality: anyRun.map((p) => ({ date: p.date, close: p.actual })),
     };
@@ -117,17 +116,15 @@ export function Stock() {
     [showMarket, bench.data, prices.data, marketStart],
   );
 
-  const replay = (i: number) => {
-    setStop(i === todayIndex ? null : i);
-    setReleaseKey((k) => k + 1);
-  };
+  // The drum turns itself to the new date and releases the futures when it settles.
+  const replay = (i: number) => setStop(i === todayIndex ? null : i);
 
   if (prices.error) {
     const notFound = prices.error instanceof ApiError && prices.error.status === 404;
     return (
       <div className="stock-missing">
         <p className="kicker">{sym}</p>
-        <h1>{notFound ? "That ticker isn't in the S&P 500 almanac." : "Couldn't load this stock."}</h1>
+        <h1>{notFound ? "That ticker isn't in the S&P 500." : "Couldn't load this stock."}</h1>
         <p>
           <Link to="/">Back to all stocks</Link>
         </p>
@@ -147,9 +144,13 @@ export function Stock() {
   const terminal = density === "terminal";
   const shown = hover ?? last;
 
+  const paths = futurePaths(focusPts);
+  const tiles = outlook(focusPts, paths, view.start, level, view.reality);
+  const turning = phase === "turning";
+
   return (
     <article className={`stock ${terminal ? "is-terminal" : "is-guided"}`}>
-      {/* ------------------------------------------------ masthead of the page */}
+      {/* ------------------------------------------------ the price, first */}
       <header className="stock-head">
         <div className="stock-title">
           <p className="kicker">
@@ -159,101 +160,115 @@ export function Stock() {
           <p className="stock-name">{m?.name ?? " "}</p>
         </div>
         <div className="stock-price">
-          <span className="stock-last num">{last ? price(last.close) : "—"}</span>
+          <span className="stock-last num" aria-label={last ? `Last close ${price(last.close)}` : undefined}>
+            {last ? price(last.close) : "—"}
+          </span>
           {day && (
-            <span className={`mono ${day.dir}`}>
-              {day.text} <span className="muted">on {last && shortDate(last.date)}</span>
+            <span className={`stock-day num ${day.dir}`}>
+              {day.text}{" "}
+              <span className="muted">on {last && shortDate(last.date)}</span>
             </span>
           )}
-          {m && <RiskMeter score={m.risk_score} level={m.risk_level} />}
           {m && (
-            <span className="stock-risk-line muted">
-              <Term k="riskScore">{m.risk_sentence}</Term>
+            <span className="stock-risk-line">
+              <RiskMeter score={m.risk_score} level={m.risk_level} />
+              <span className="muted">
+                <Term k="riskScore">{m.risk_sentence}</Term>
+              </span>
             </span>
           )}
         </div>
       </header>
 
-      <div className="stock-grid">
-        {/* ------------------------------------------------ chart + instruments */}
-        <section className="stock-chart" aria-label="Price chart and forecasts">
-          <div className="instruments">
-            <div className="instrument-row">
-              <div className="segmented" role="group" aria-label="Chart type">
-                <button type="button" aria-pressed={mode === "candles"} onClick={() => setMode("candles")}>
-                  Candles
+      {/* ------------------------------------------------ the drum */}
+      <section className="stock-chart" aria-label="Price chart and forecasts">
+        <div className="instruments">
+          <div className="instrument-row">
+            <div className="segmented" role="group" aria-label="Chart type">
+              <button type="button" aria-pressed={mode === "candles"} onClick={() => setMode("candles")}>
+                Candles
+              </button>
+              <button type="button" aria-pressed={mode === "line"} onClick={() => setMode("line")}>
+                Line
+              </button>
+            </div>
+            <div className="segmented" role="group" aria-label="Time shown before the pen">
+              {RANGES.map((r) => (
+                <button key={r} type="button" aria-pressed={range === r} onClick={() => setRange(r)}>
+                  {r}
                 </button>
-                <button type="button" aria-pressed={mode === "line"} onClick={() => setMode("line")}>
-                  Line
-                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              className="btn"
+              aria-pressed={showMarket}
+              onClick={() => setShowMarket((v) => !v)}
+              title="Compare this stock with the S&P 500 over the chosen time range"
+            >
+              <span aria-hidden="true">╌</span> vs S&amp;P 500
+            </button>
+            <button
+              type="button"
+              className="btn"
+              aria-pressed={showPatterns}
+              onClick={() => {
+                setShowPatterns((v) => !v);
+                setMode("candles");
+                setPickedMarker(null);
+              }}
+              title="Mark classic candlestick patterns and check whether they meant anything"
+            >
+              Patterns
+            </button>
+            <div className="ohlc num" aria-live="off">
+              {shown && !turning && (
+                <>
+                  <span className="muted">{shortDate(shown.date)}</span> <span className="muted">O</span> {price(shown.open)}{" "}
+                  <span className="muted">H</span> {price(shown.high)} <span className="muted">L</span> {price(shown.low)}{" "}
+                  <span className="muted">C</span> <strong>{price(shown.close)}</strong>
+                </>
+              )}
+            </div>
+          </div>
+          {!tooNew && (
+            <div className="instrument-row model-row">
+              <div className="model-chips" role="group" aria-label="Forecast models">
+                {MODELS.map((mk) => {
+                  const on = visible.includes(mk) || focus === mk;
+                  return (
+                    <span key={mk} className={`chip${on ? " on" : ""}${focus === mk ? " focus" : ""}`}>
+                      <button
+                        type="button"
+                        aria-pressed={on}
+                        title={MODEL_BLURB[mk]}
+                        onClick={() => setVisible((v) => (v.includes(mk) ? v.filter((x) => x !== mk) : [...v, mk]))}
+                      >
+                        {MODEL_LABEL[mk]}
+                      </button>
+                      <button
+                        type="button"
+                        className="chip-focus"
+                        aria-label={`Draw ${MODEL_LABEL[mk]}'s range and possible futures`}
+                        aria-pressed={focus === mk}
+                        onClick={() => {
+                          setFocus(mk);
+                          setReleaseKey((k) => k + 1);
+                        }}
+                      >
+                        <span aria-hidden="true">{focus === mk ? "●" : "○"}</span>
+                      </button>
+                    </span>
+                  );
+                })}
               </div>
-              <button
-                type="button"
-                className="btn patterns-toggle"
-                aria-pressed={showPatterns}
-                onClick={() => {
-                  setShowPatterns((v) => !v);
-                  setMode("candles");
-                  setPickedMarker(null);
-                }}
-                title="Mark classic candlestick patterns and check whether they meant anything"
-              >
-                {showPatterns ? "◆ Patterns on" : "◇ Patterns"}
-              </button>
-              <button
-                type="button"
-                className="btn market-toggle"
-                aria-pressed={showMarket}
-                onClick={() => setShowMarket((v) => !v)}
-                title="Compare this stock with the S&P 500 over the chosen time range"
-              >
-                {showMarket ? "╌ vs S&P 500 on" : "╌ vs S&P 500"}
-              </button>
-              <div className="segmented" role="group" aria-label="Time range">
-                {RANGES.map((r) => (
-                  <button key={r} type="button" aria-pressed={range === r && !replayOrigin} disabled={!!replayOrigin} onClick={() => setRange(r)}>
-                    {r}
+              <div className="segmented" role="group" aria-label="Range shown around the focus model">
+                {LEVELS.map((lv) => (
+                  <button key={lv} type="button" aria-pressed={level === lv} onClick={() => setLevel(lv)}>
+                    {lv}%
                   </button>
                 ))}
               </div>
-              <div className="ohlc mono" aria-live="off">
-                {shown && (
-                  <>
-                    <span className="muted">{shortDate(shown.date)}</span> O {price(shown.open)} H {price(shown.high)} L {price(shown.low)} C{" "}
-                    <strong>{price(shown.close)}</strong>
-                  </>
-                )}
-              </div>
-            </div>
-            <div className="model-chips" role="group" aria-label="Forecast models">
-              <span className="kicker">Models</span>
-              {MODELS.map((mk) => {
-                const on = visible.includes(mk) || focus === mk;
-                return (
-                  <span key={mk} className={`chip${on ? " on" : ""}${focus === mk ? " focus" : ""}`}>
-                    <button
-                      type="button"
-                      aria-pressed={on}
-                      title={MODEL_BLURB[mk]}
-                      onClick={() => setVisible((v) => (v.includes(mk) ? v.filter((x) => x !== mk) : [...v, mk]))}
-                    >
-                      {MODEL_LABEL[mk]}
-                    </button>
-                    <button
-                      type="button"
-                      className="chip-focus"
-                      aria-label={`Show ${MODEL_LABEL[mk]}'s range and possible futures`}
-                      aria-pressed={focus === mk}
-                      onClick={() => {
-                        setFocus(mk);
-                        setReleaseKey((k) => k + 1);
-                      }}
-                    >
-                      ◎
-                    </button>
-                  </span>
-                );
-              })}
               <a
                 className="mg-link"
                 href="#model-guide"
@@ -269,156 +284,160 @@ export function Stock() {
                 What are these?
               </a>
             </div>
-          </div>
-
-          {tooNew ? (
-            <div className="too-new">
-              <h2>Too new to forecast</h2>
-              <p>
-                {sym} has traded for less than a year, so there isn't enough history to fit models or test them honestly. Its price
-                chart is still here.
-              </p>
-            </div>
-          ) : null}
-
-          {bars.length ? (
-            <FuturesChart
-              bars={view.bars}
-              mode={mode}
-              range={range}
-              focus={focus}
-              forecasts={view.forecasts}
-              visibleModels={visible}
-              level={level}
-              emphasis={defaults.emphasis}
-              reality={view.reality}
-              releaseKey={releaseKey}
-              replay={!!replayOrigin}
-              onPhase={setPhase}
-              onHover={setHover}
-              markers={showPatterns && !replayOrigin ? patterns.data?.occurrences : undefined}
-              onMarkerClick={setPickedMarker}
-              benchmark={marketLine}
-            />
-          ) : (
-            <div className="skeleton chart-skeleton" aria-hidden="true" />
           )}
+        </div>
 
-          {showMarket && (
-            <div className="market-compare" aria-live="polite">
-              {replayOrigin ? (
-                <p className="muted">The S&amp;P 500 line is hidden while you rewind. Slide the timeline back to today to see it.</p>
-              ) : bench.isError ? (
-                <p className="muted">S&amp;P 500 data isn't available right now.</p>
-              ) : market ? (
-                <MarketReadout sym={sym} c={market} />
-              ) : (
-                <p className="muted">Loading the S&amp;P 500…</p>
-              )}
-            </div>
-          )}
-
-          {!terminal && !tooNew && endBand && (
-            <p className="chart-caption">
-              {replayOrigin ? (
-                <>
-                  Rewound to <strong>{longDate(replayOrigin)}</strong>. Each faint line is one future {MODEL_LABEL[focus]} considered possible;
-                  the shaded fan is its {level}% range. The ink line is what actually happened next.
-                </>
-              ) : (
-                <>
-                  Each faint line is one possible future. {MODEL_LABEL[focus]}'s{" "}
-                  <Term k="forecastRange">{level}% range</Term> says that by{" "}
-                  <strong>{shortDate(focusPts[focusPts.length - 1].date)}</strong> the price should land between{" "}
-                  <strong className="num">{price(endBand.lo)}</strong> and <strong className="num">{price(endBand.hi)}</strong>{" "}
-                  {level} times out of 100 — if the model is honest. The scorecard checks that.
-                  {focusShape && last && <> {describeLine(focus, focusShape, last.close)}</>}
-                </>
-              )}
+        {tooNew && (
+          <div className="too-new">
+            <h2>Too new to forecast</h2>
+            <p>
+              {sym} has traded for less than a year, so there isn't enough history to fit models or test them honestly. Its price chart
+              is still here.
             </p>
-          )}
+          </div>
+        )}
 
-          {/* ------------------------------------------------ Rewind & Release */}
-          {!tooNew && (
-            <div className="rewind">
-              <div className="rewind-head">
-                <div>
-                  <p className="kicker">Rewind &amp; release</p>
-                  {!terminal && (
-                    <p className="rewind-help">
-                      Drag back in time. The model only sees prices up to that day — then watch its possible futures spread out, and
-                      reality draw itself through them.
-                    </p>
-                  )}
-                </div>
-                <div className="rewind-actions">
-                  <button type="button" className="btn" onClick={() => setReleaseKey((k) => k + 1)} disabled={phase === "release" || phase === "reality"}>
-                    {replayOrigin ? "▶ Replay" : "▶ Release futures"}
-                  </button>
-                  {replayOrigin && (
-                    <button type="button" className="btn" onClick={() => replay(todayIndex)}>
-                      Back to today
-                    </button>
-                  )}
-                </div>
-              </div>
-              <Scrubber origins={origins} value={stopIndex} onChange={replay} disabled={!origins.length} />
+        {bars.length ? (
+          <FuturesChart
+            bars={bars}
+            mode={mode}
+            range={range}
+            focus={focus}
+            forecasts={view.forecasts}
+            visibleModels={visible}
+            level={level}
+            emphasis={defaults.emphasis}
+            origin={replayOrigin}
+            stops={tooNew ? [] : origins}
+            onOriginChange={replay}
+            onPen={(p) => rulerRef.current?.setPen(p)}
+            reality={view.reality}
+            releaseKey={releaseKey}
+            onPhase={setPhase}
+            onHover={setHover}
+            markers={showPatterns && !replayOrigin ? patterns.data?.occurrences : undefined}
+            onMarkerClick={setPickedMarker}
+            benchmark={marketLine}
+          />
+        ) : (
+          <div className="skeleton chart-skeleton" aria-hidden="true" />
+        )}
+
+        {!tooNew && (
+          <div className="drum-foot">
+            <div className="drum-status">
+              {turning ? (
+                <p>
+                  <strong>Turning…</strong> <span className="muted">Let go on any month line.</span>
+                </p>
+              ) : replayOrigin ? (
+                <p>
+                  Turned back to <strong>{longDate(replayOrigin)}</strong>.{" "}
+                  <span className="muted">The pencil is what {MODEL_LABEL[focus]} expected then; the violet ink is what happened.</span>
+                </p>
+              ) : (
+                <p>
+                  <strong>Drag the chart sideways</strong> <span className="muted">to turn back time and test an old forecast.</span>
+                </p>
+              )}
             </div>
-          )}
-
-          {replayOrigin && tally && (
-            <TallyCard tally={tally} level={level} show={phase === "done"} totals={totals} />
-          )}
-
-          {showPatterns && patterns.data && (
-            <div className="stock-patterns">
-              <PatternPanel data={patterns.data} selected={pickedMarker} symbol={sym} />
+            <div className="drum-actions">
+              <button type="button" className="btn" onClick={() => setReleaseKey((k) => k + 1)} disabled={turning || phase === "release" || phase === "reality"}>
+                <span aria-hidden="true">↻</span> {replayOrigin ? "Replay" : "Redraw futures"}
+              </button>
+              {replayOrigin && (
+                <button type="button" className="btn primary" onClick={() => replay(todayIndex)} disabled={turning}>
+                  Back to today
+                </button>
+              )}
             </div>
-          )}
-          {showPatterns && patterns.isLoading && <div className="skeleton" style={{ height: 200, marginTop: 24 }} aria-hidden="true" />}
+            <Scrubber ref={rulerRef} origins={origins} value={stopIndex} onChange={replay} disabled={!origins.length} />
+          </div>
+        )}
 
-          {!tooNew && last && forecasts.data && (
-            <ModelGuide
-              key={density}
-              sym={sym}
-              lastClose={last.close}
-              forecasts={forecasts.data}
-              scorecard={scorecard.data}
-              focus={focus}
-              defaultOpen={!terminal}
-              onShow={(mk) => {
-                setFocus(mk);
-                setStop(null);
-                setReleaseKey((k) => k + 1);
-                document.querySelector(".stock-chart")?.scrollIntoView({ behavior: "smooth", block: "start" });
-              }}
-            />
-          )}
+        {showMarket && (
+          <div className="market-compare" aria-live="polite">
+            {replayOrigin ? (
+              <p className="muted">The S&amp;P 500 line is hidden while the chart is turned back. Return to today to see it.</p>
+            ) : bench.isError ? (
+              <p className="muted">S&amp;P 500 data isn't available right now.</p>
+            ) : market ? (
+              <MarketReadout sym={sym} c={market} />
+            ) : (
+              <p className="muted">Loading the S&amp;P 500…</p>
+            )}
+          </div>
+        )}
+
+        {replayOrigin && tally && <TallyCard tally={tally} level={level} show={phase === "done"} />}
+      </section>
+
+      {/* ------------------------------------------------ the outlook, in plain words */}
+      {!tooNew && tiles.length > 0 && (
+        <section className="stock-section" aria-labelledby="outlook-title">
+          <header className="section-head">
+            <h2 id="outlook-title">
+              {replayOrigin ? `What ${MODEL_LABEL[focus]} expected on ${shortDate(replayOrigin)}` : `What ${MODEL_LABEL[focus]} expects`}
+            </h2>
+            {!terminal && endBand && (
+              <p className="section-lede">
+                Counted from the {paths.length} pencilled futures on the chart. A chance near 50% means the model has no real idea which
+                way it goes, which is the usual, honest answer.
+                {focusShape && last && <> {describeLine(focus, focusShape, last.close)}</>}
+              </p>
+            )}
+          </header>
+          <Outlook
+            tiles={tiles}
+            start={view.start}
+            level={level}
+            model={focus}
+            showActual={!!replayOrigin && phase === "done"}
+            totals={totals}
+          />
         </section>
+      )}
 
-        {/* ------------------------------------------------ side: confidence dial, scorecard, metrics */}
-        <aside className="stock-side">
-          {!tooNew && (
-            <div className="confidence">
-              <Dial
-                label="Confidence"
-                options={LEVELS}
-                value={level}
-                onChange={(v) => setLevel(v)}
-                size={terminal ? 96 : 120}
-                caption="Wider range = more honest, less precise."
-              />
-            </div>
-          )}
-          {scorecard.data && <ScorecardPanel card={scorecard.data} compact={terminal} />}
-        </aside>
+      {showPatterns && (
+        <section className="stock-section stock-patterns">
+          {patterns.data ? (
+            <PatternPanel data={patterns.data} selected={pickedMarker} symbol={sym} />
+          ) : patterns.isLoading ? (
+            <div className="skeleton" style={{ height: 200 }} aria-hidden="true" />
+          ) : null}
+        </section>
+      )}
+
+      {/* ------------------------------------------------ the track record and the ride */}
+      <div className="stock-lower">
+        {scorecard.data && (
+          <section className="stock-section" aria-labelledby="scorecard-title">
+            <ScorecardPanel card={scorecard.data} compact={terminal} />
+          </section>
+        )}
+        {m && (
+          <section className="stock-section" aria-labelledby="metrics-title">
+            <h2 id="metrics-title">{terminal ? "Risk" : "How bumpy has the ride been?"}</h2>
+            <MetricsLedger m={m} compact={terminal} />
+          </section>
+        )}
       </div>
 
-      {m && (
-        <section className="stock-section" aria-labelledby="metrics-title">
-          <h2 id="metrics-title">{terminal ? "Risk" : "How bumpy has the ride been?"}</h2>
-          <MetricsLedger m={m} compact={terminal} />
-        </section>
+      {!tooNew && last && forecasts.data && (
+        <ModelGuide
+          key={density}
+          sym={sym}
+          lastClose={last.close}
+          forecasts={forecasts.data}
+          scorecard={scorecard.data}
+          focus={focus}
+          defaultOpen={false}
+          onShow={(mk) => {
+            setFocus(mk);
+            setReleaseKey((k) => k + 1);
+            document.querySelector(".stock-chart")?.scrollIntoView({ behavior: "smooth", block: "start" });
+          }}
+        />
       )}
 
       <div className="stock-section">
@@ -432,12 +451,10 @@ function TallyCard({
   tally,
   level,
   show,
-  totals,
 }: {
   tally: Tally;
   level: number;
   show: boolean;
-  totals: { n: number; inside: number; beat: number } | null;
 }) {
   const name = MODEL_LABEL[tally.model];
   return (
@@ -466,17 +483,6 @@ function TallyCard({
               )}
             </ul>
           </div>
-          {totals && (
-            <p className="tally-totals">
-              Across all {totals.n} replays, reality landed inside {name}'s {level}% range <strong>{totals.inside}</strong> times
-              {tally.model !== "naive" && (
-                <>
-                  , and {name} beat the naive guess <strong>{totals.beat}</strong> times
-                </>
-              )}
-              .
-            </p>
-          )}
         </>
       )}
     </div>

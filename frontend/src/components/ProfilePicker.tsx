@@ -69,7 +69,7 @@ export function ProfilePicker() {
 
   return (
     <section className="picker" aria-labelledby="picker-title">
-      <p className="kicker">Before we open the almanac</p>
+      <p className="kicker">Before we start</p>
       <h1 id="picker-title" className="picker-title">
         How do you feel about <em>swings</em>?
       </h1>

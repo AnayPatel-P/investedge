@@ -1,13 +1,15 @@
+/* floating chrome over scrolling content: the one place translucency earns its keep (craft §4) */
 .masthead {
-  border-bottom: var(--hairline-strong);
-  background: color-mix(in srgb, var(--paper) 88%, transparent);
-  backdrop-filter: blur(6px);
+  border-bottom: 1px solid color-mix(in srgb, var(--rule-strong) 70%, transparent);
+  background: color-mix(in oklab, var(--paper) 72%, transparent);
+  backdrop-filter: blur(20px) saturate(160%);
+  -webkit-backdrop-filter: blur(20px) saturate(160%);
   position: sticky;
   top: 0;
   z-index: 20;
 }
 .masthead-inner {
-  max-width: 1320px;
+  max-width: 1280px;
   margin: 0 auto;
   padding: var(--s-3) var(--gutter);
   display: grid;
@@ -22,17 +24,25 @@
   line-height: 1;
 }
 .wordmark-name {
-  font-family: var(--font-display);
-  font-size: 1.6rem;
-  font-weight: 640;
-  font-variation-settings: "opsz" 144, "SOFT" 80, "WONK" 1;
-  letter-spacing: -0.03em;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+.wordmark-name::before {
+  /* the pen's nib: the brand's one mark */
+  content: "";
+  display: inline-block;
+  width: 0.45em;
+  height: 0.45em;
+  margin-right: 0.35em;
+  border-radius: 50%;
+  background: var(--reality);
+  vertical-align: 0.12em;
 }
 .wordmark-tag {
-  font-family: var(--font-display);
-  font-style: italic;
-  font-size: 0.78rem;
-  color: var(--forecast-text);
+  font-size: var(--step--1);
+  letter-spacing: var(--tr--1);
+  color: var(--muted);
   margin-top: 3px;
 }
 .masthead-nav {
@@ -43,10 +53,13 @@
 .masthead-nav a {
   text-decoration: none;
   padding: 4px 0;
+  font-weight: 550;
+  color: var(--ink-soft);
   border-bottom: 2px solid transparent;
 }
 .masthead-nav a.active {
-  border-bottom-color: var(--forecast);
+  color: var(--ink);
+  border-bottom-color: var(--reality);
 }
 .masthead-controls {
   display: flex;
@@ -57,15 +70,20 @@
   border: var(--hairline-strong);
   background: transparent;
   border-radius: var(--radius-1);
-  padding: 0.35em 0.7em;
+  min-height: 2.25rem;
+  padding: 0 0.7em;
+  transition: transform var(--t-press) var(--ease-out);
   cursor: pointer;
   font-size: var(--step--1);
   display: inline-flex;
   gap: 6px;
-  align-items: baseline;
+  align-items: center;
 }
 .profile-chip:hover {
-  border-color: var(--ink);
+  border-color: var(--ink-soft);
+}
+.profile-chip:active {
+  transform: scale(0.97);
 }
 
 /* search */
@@ -79,9 +97,10 @@
   width: 100%;
   font: inherit;
   font-size: var(--step--1);
-  padding: 0.6em 0.8em;
+  min-height: 2.25rem;
+  padding: 0 0.8em;
   border: var(--hairline-strong);
-  border-radius: var(--radius-1);
+  border-radius: var(--radius-2);
   background: var(--surface);
   color: var(--ink);
 }
@@ -96,9 +115,12 @@
   margin: 0;
   padding: 4px 0;
   list-style: none;
-  background: var(--surface);
+  background: var(--surface-2);
   border: var(--hairline-strong);
-  box-shadow: var(--lift);
+  border-radius: var(--radius-2);
+  box-shadow: var(--lift-2);
+  transform-origin: top center;
+  animation: popover-in var(--t-fast) var(--ease-out);
   z-index: 30;
   max-height: 60vh;
   overflow: auto;
@@ -123,7 +145,7 @@
 }
 .search-sector {
   grid-area: sector;
-  font-size: 0.78rem;
+  font-size: var(--step--1);
 }
 .search-empty {
   padding: 8px 12px;
@@ -132,7 +154,7 @@
 .site-footer {
   border-top: var(--hairline-strong);
   padding: var(--s-5) var(--gutter);
-  max-width: 1320px;
+  max-width: 1280px;
   margin: 0 auto;
   width: 100%;
   display: grid;
@@ -163,6 +185,12 @@
     display: none;
   }
 }
+@media (max-width: 640px) {
+  /* on a phone the three-row header would eat a quarter of the screen: let it scroll away */
+  .masthead {
+    position: static;
+  }
+}
 @media (max-width: 420px) {
   .wordmark-tag {
     display: none;
@@ -186,5 +214,19 @@
   }
   .masthead-nav {
     gap: var(--s-3);
+  }
+}
+
+@keyframes popover-in {
+  from {
+    opacity: 0;
+    transform: scale(0.98) translateY(-4px);
+  }
+}
+@media (prefers-reduced-transparency: reduce) {
+  .masthead {
+    background: var(--paper);
+    backdrop-filter: none;
+    -webkit-backdrop-filter: none;
   }
 }

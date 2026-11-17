@@ -1,3 +1,4 @@
+import { useRef, useState, type KeyboardEvent } from "react";
 import type { Forecasts, ModelKey, Scorecard } from "../api/types";
 import { lineShape, type LineShape } from "../chart/lineShape";
 import { MODEL_LABEL, pct, price } from "../format";
@@ -32,6 +33,21 @@ interface Props {
 /** "Meet the models": what each forecasting model is, how it differs, and how it did on this stock. */
 export function ModelGuide({ sym, lastClose, forecasts, scorecard, focus, onShow, defaultOpen }: Props) {
   const rows = new Map(scorecard?.models.map((r) => [r.model, r]) ?? []);
+  const [tab, setTab] = useState<ModelKey>(focus);
+  const tabRefs = useRef<Partial<Record<ModelKey, HTMLButtonElement | null>>>({});
+  const onKey = (e: KeyboardEvent) => {
+    const d = e.key === "ArrowRight" ? 1 : e.key === "ArrowLeft" ? -1 : 0;
+    if (!d) return;
+    e.preventDefault();
+    const next = ORDER[(ORDER.indexOf(tab) + d + ORDER.length) % ORDER.length];
+    setTab(next);
+    tabRefs.current[next]?.focus();
+  };
+  const m = tab;
+  const g = MODEL_GUIDE[m];
+  const pts = forecasts[m] ?? [];
+  const shape = lineShape(pts, lastClose);
+  const row = rows.get(m);
   return (
     <details className="model-guide" id="model-guide" open={defaultOpen}>
       <summary>
@@ -43,49 +59,66 @@ export function ModelGuide({ sym, lastClose, forecasts, scorecard, focus, onShow
         or the economy. Only Prophet draws curves; the others usually draw a flat line because they found nothing reliable to follow.
         That's an honest answer, not a bug. The <strong>shaded range</strong> around each line matters more than the line itself.
       </p>
-      <div className="mg-grid">
-        {ORDER.map((m) => {
-          const g = MODEL_GUIDE[m];
-          const pts = forecasts[m] ?? [];
-          const shape = lineShape(pts, lastClose);
-          const row = rows.get(m);
-          return (
-            <article key={m} className={`mg-card${focus === m ? " focus" : ""}`} aria-labelledby={`mg-${m}`}>
-              <header className="mg-head">
-                <h3 id={`mg-${m}`}>{MODEL_LABEL[m]}</h3>
-                <span className="mg-nick">{g.nickname}</span>
-              </header>
-              <p className="mg-analogy">{g.analogy}</p>
-              <dl className="mg-facts">
-                <dt>How it works</dt>
-                <dd>{g.how}</dd>
-                <dt>Its line on the chart</dt>
-                <dd>{g.line}</dd>
-                <dt>Good at</dt>
-                <dd>{g.good}</dd>
-                <dt>Watch out</dt>
-                <dd>{g.watch}</dd>
-              </dl>
-              <div className="mg-live">
-                <p className="kicker">On {sym} right now</p>
-                <p>{shape ? describeLine(m, shape, lastClose) : "No forecast for this stock."}</p>
-                {row && (
-                  <p className="muted">
-                    Past year:{" "}
-                    {m === "naive" || m === "garch" ? "its" : `${row.beats_baseline ? "beat" : "did not beat"} the naive guess; its`} 95% range
-                    caught the real price {pct(row.coverage_95, 0)} of the time.
-                  </p>
-                )}
-              </div>
-              {pts.length > 0 && (
-                <button type="button" className="btn mg-show" aria-pressed={focus === m} onClick={() => onShow(m)}>
-                  {focus === m ? "◎ On the chart" : "Show its futures on the chart"}
-                </button>
-              )}
-            </article>
-          );
-        })}
+      <div className="mg-tabs" role="tablist" aria-label="Forecasting models" onKeyDown={onKey}>
+        {ORDER.map((k) => (
+          <button
+            key={k}
+            ref={(el) => {
+              tabRefs.current[k] = el;
+            }}
+            type="button"
+            role="tab"
+            id={`mg-tab-${k}`}
+            aria-selected={tab === k}
+            aria-controls="mg-panel"
+            tabIndex={tab === k ? 0 : -1}
+            className="mg-tab"
+            onClick={() => setTab(k)}
+          >
+            <span className="mg-tab-name">{MODEL_LABEL[k]}</span>
+            <span className="mg-tab-nick">{MODEL_GUIDE[k].nickname}</span>
+            {focus === k && <span className="mg-tab-drawn">on the chart</span>}
+          </button>
+        ))}
       </div>
+      <article className="mg-panel" id="mg-panel" role="tabpanel" aria-labelledby={`mg-tab-${m}`}>
+        <div className="mg-main">
+          <p className="mg-analogy">{g.analogy}</p>
+          <dl className="mg-facts">
+            <div>
+              <dt>How it works</dt>
+              <dd>{g.how}</dd>
+            </div>
+            <div>
+              <dt>Its line on the chart</dt>
+              <dd>{g.line}</dd>
+            </div>
+            <div>
+              <dt>Good at</dt>
+              <dd>{g.good}</dd>
+            </div>
+            <div>
+              <dt>Watch out</dt>
+              <dd>{g.watch}</dd>
+            </div>
+          </dl>
+        </div>
+        <aside className="mg-live">
+          <p className="kicker">On {sym} right now</p>
+          <p>{shape ? describeLine(m, shape, lastClose) : "No forecast for this stock."}</p>
+          {row && (
+            <p className="muted">
+              Past year: {m === "naive" || m === "garch" ? "its" : `${row.beats_baseline ? "beat" : "did not beat"} the naive guess; its`} 95%
+              range caught the real price {pct(row.coverage_95, 0)} of the time.
+            </p>
+          )}
+          {pts.length > 0 && (
+            <button type="button" className="btn mg-show" aria-pressed={focus === m} onClick={() => onShow(m)}>
+              {focus === m ? "Drawn on the chart" : "Draw its futures on the chart"}
+            </button>
+          )}
+        </aside>
+      </article>
     </details>
   );
 }

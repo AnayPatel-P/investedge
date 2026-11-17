@@ -1,6 +1,6 @@
 .fit {
-  font-family: var(--font-mono);
-  font-size: 0.78rem;
+  font-size: var(--step--1);
+  font-weight: 600;
   white-space: nowrap;
 }
 .fit-good {
@@ -22,9 +22,8 @@
   position: relative;
   width: 96px;
   height: 6px;
-  border: var(--hairline-strong);
-  border-radius: 1px;
-  background: linear-gradient(90deg, transparent, color-mix(in srgb, var(--down) 18%, transparent));
+  border-radius: 3px;
+  background: linear-gradient(90deg, var(--paper-deep), color-mix(in srgb, var(--down) 28%, var(--paper-deep)));
 }
 .riskmeter-tick {
   position: absolute;
@@ -39,10 +38,11 @@
   width: 3px;
   height: 14px;
   margin-left: -1.5px;
+  border-radius: 2px;
   background: var(--ink);
 }
 .riskmeter-label {
-  font-size: 0.75rem;
+  font-size: var(--step--1);
   color: var(--muted);
   min-width: 6.5em;
 }

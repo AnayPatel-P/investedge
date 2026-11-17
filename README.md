@@ -20,9 +20,12 @@ from a chart.
 
 ## What it does
 
-- **Rewind & Release.** Drag the timeline back to a past date. The model only sees prices up to that day,
-  hundreds of possible futures spread out from it, and then the real price draws itself through them. A small
+- **Rewind & Release.** The chart works like a barograph drum. Drag it sideways (or flick it) to turn back
+  to a past forecast date: the pen lifts, everything after that day disappears, and when the drum settles the
+  model's possible futures are pencilled in and the real price inks itself through them in violet. A small
   card tells you whether reality stayed inside the model's range and whether it beat the naive guess.
+- **The outlook in plain words.** Under the chart, each horizon says how many of the drawn futures end higher
+  ("97 of 180, a coin flip"), next to a calibration tag with the model's real record on that stock.
 - **A scorecard for every stock.** Each model's accuracy compared with the naive guess, how often its 95%
   range really caught the price (Prophet's often didn't), and a one-line verdict in plain English.
 - **Risk in plain English.** Volatility, beta against the S&P 500, worst drops, dividend yield, and a risk
@@ -45,9 +48,9 @@ from a chart.
   instead of guessing and declines buy/sell questions. It's switched off on the free demo; see
   [Choosing the tutor's model](#choosing-the-tutors-model) for why.
 
-| Rewind & Release | Tally + scorecard |
+| Rewind & Release | Tally + outlook |
 |---|---|
-| ![Rewound chart with reality drawn through the fan of futures](docs/images/rewind-and-release.jpg) | ![Tally card and model scorecard](docs/images/tally-and-scorecard.jpg) |
+| ![Rewound chart with reality drawn through the fan of futures](docs/images/rewind-and-release.jpg) | ![Tally card, outlook strip and calibration tag](docs/images/tally-and-scorecard.jpg) |
 | **Terminal view** | **Candlestick patterns and their track record** |
 | ![Dense dark terminal view of NVDA](docs/images/terminal-mode.jpg) | ![Pattern learn cards with track records](docs/images/pattern-cards.jpg) |
 
@@ -174,7 +177,7 @@ I treated it like a small product rather than a weekend script: a PRD, a phased 
 with the reasoning behind 50-plus choices, including the ones I reversed. They're all in
 [`docs/pm/`](docs/pm/). There are 83 backend tests (including one that checks the backtest can't see the
 future, tests for the tutor that use a fake client, and tests that make sure the eval grader catches invented
-numbers) and 24 frontend tests.
+numbers) and 34 frontend tests (including the drum's spring physics and the outlook counts).
 
 ## Data and disclaimer
 

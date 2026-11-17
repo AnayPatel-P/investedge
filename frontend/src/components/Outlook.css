@@ -1,0 +1,94 @@
+.outlook {
+  display: grid;
+  gap: var(--s-4);
+}
+.outlook-tiles {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: var(--s-3);
+}
+.outlook-tile {
+  display: grid;
+  gap: var(--s-2);
+  align-content: start;
+  padding: var(--s-4);
+  background: var(--surface);
+  border-radius: var(--radius-2);
+  box-shadow: inset 0 0 0 1px var(--rule);
+}
+.outlook-date {
+  font-weight: 500;
+  letter-spacing: 0;
+  text-transform: none;
+}
+.outlook-chance {
+  display: flex;
+  align-items: baseline;
+  gap: var(--s-2);
+}
+.outlook-chance .num {
+  font-size: var(--step-3);
+  line-height: var(--lh-3);
+  letter-spacing: var(--tr-3);
+  font-weight: 300;
+}
+.outlook-chance-label {
+  color: var(--ink-soft);
+  font-size: var(--step--1);
+}
+.outlook-words,
+.outlook-range,
+.outlook-actual {
+  font-size: var(--step--1);
+  line-height: var(--lh--1);
+}
+.outlook-words {
+  color: var(--ink-soft);
+}
+.outlook-range {
+  color: var(--forecast-text);
+}
+.outlook-actual {
+  font-weight: 600;
+  padding-top: var(--s-2);
+  border-top: var(--hairline);
+}
+
+/* The calibration tag: a paper tag tied to the instrument, punched hole and all. */
+.calibration {
+  position: relative;
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: var(--s-3);
+  align-items: start;
+  max-width: 72ch;
+  padding: var(--s-3) var(--s-4) var(--s-3) var(--s-3);
+  background: var(--surface-2);
+  border-radius: var(--radius-1) var(--radius-2) var(--radius-2) var(--radius-1);
+  box-shadow:
+    inset 0 0 0 1px var(--rule-strong),
+    var(--lift);
+  font-size: var(--step--1);
+  line-height: var(--lh--1);
+}
+.calibration-hole {
+  width: 12px;
+  height: 12px;
+  margin-top: 2px;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: inset 0 0 0 1.5px var(--rule-strong);
+}
+.calibration p + p {
+  margin-top: 2px;
+}
+
+:root[data-density="terminal"] .outlook-tile {
+  padding: var(--s-3);
+}
+:root[data-density="terminal"] .outlook-words {
+  display: none;
+}
