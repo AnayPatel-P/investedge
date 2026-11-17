@@ -156,3 +156,6 @@
   opacity: 0.5;
   cursor: not-allowed;
 }
+.briefing-title {
+  font-size: var(--step-1);
+}

@@ -1,0 +1,457 @@
+/* The lineup: model cards. Front = who it is and its record; back = its season on this stock. */
+.lineup {
+  display: grid;
+  gap: var(--s-5);
+}
+.lineup-head {
+  display: grid;
+  gap: var(--s-2);
+  max-width: var(--measure);
+}
+.lineup-head h2 {
+  font-style: italic;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: var(--step-3);
+  letter-spacing: 0.005em;
+}
+.lineup-lede {
+  font-size: var(--step-1);
+  line-height: var(--lh-1);
+}
+.lineup-lede .muted {
+  font-size: var(--step-0);
+}
+.lineup-note {
+  font-size: var(--step--1);
+  color: var(--down);
+}
+.lineup-rail {
+  list-style: none;
+  margin: 0;
+  padding: 14px 0 4px; /* room for the MVP badge */
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: var(--s-4);
+}
+
+/* ---------------- the card */
+.player {
+  --flip: 560ms;
+  perspective: 1200px;
+  height: 100%;
+}
+.player-turn {
+  position: relative;
+  display: grid;
+  height: 100%;
+  min-height: 22.5rem;
+  transform-style: preserve-3d;
+  /* slight overshoot: a card flipped by hand settles past flat and back. Transitions reverse from where they are, so a second click mid-turn turns it back. */
+  transition: transform var(--flip) cubic-bezier(0.3, 1.32, 0.5, 1);
+}
+.player.is-flipped .player-turn {
+  transform: rotateY(180deg);
+}
+.player-face {
+  grid-area: 1 / 1;
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  border-radius: var(--radius-2);
+  border: 6px solid var(--c);
+  padding: var(--s-4) var(--s-4) var(--s-3);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+.player-front {
+  background: var(--surface-2);
+  box-shadow: var(--lift);
+  position: relative;
+  transition: box-shadow var(--t-mid) var(--ease-out), transform var(--t-mid) var(--ease-out);
+}
+.player.is-focus .player-front {
+  box-shadow: 0 0 0 3px var(--paper), 0 0 0 5px var(--c), var(--lift);
+}
+.player-back {
+  transform: rotateY(180deg);
+  background: var(--card-stock);
+  color: var(--shell);
+  border-color: var(--c);
+  padding: var(--s-3) var(--s-3) var(--s-2);
+}
+:root[data-density="terminal"] .player-back {
+  color: var(--ink);
+}
+
+.player-mvp {
+  position: absolute;
+  top: -15px;
+  right: -12px;
+  background: var(--mvp);
+  color: var(--on-mvp);
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 800;
+  font-size: 1rem;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  padding: 7px 10px 6px;
+  border-radius: var(--radius-pill);
+  border: 3px solid var(--surface-2);
+  box-shadow: 0 2px 6px -2px rgba(22, 28, 58, 0.4);
+  transform: rotate(6deg);
+}
+.player-name {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 800;
+  font-size: 1.85rem;
+  line-height: 0.95;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+  color: var(--c);
+}
+.player-pos {
+  margin-top: var(--s-1);
+  font-size: var(--step--1);
+  color: var(--muted);
+}
+.player-glyph {
+  width: 100%;
+  height: 36px;
+  margin: var(--s-3) 0 var(--s-2);
+  overflow: visible;
+}
+.player-glyph path {
+  fill: none;
+  stroke: var(--c);
+  stroke-width: 3;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+.player-stats {
+  margin: 0;
+  display: grid;
+  gap: var(--s-2);
+}
+.player-stats div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: var(--s-2);
+  border-top: var(--hairline);
+  padding-top: var(--s-2);
+  font-size: var(--step--1);
+}
+.player-stats dt {
+  color: var(--muted);
+}
+.player-stats dd {
+  margin: 0;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.player-stats .player-stat-main {
+  display: grid;
+  border-top: 0;
+  padding-top: 0;
+  gap: 0;
+}
+.player-stat-main dt {
+  /* two lines reserved, so every card's number and rows sit at the same height */
+  min-height: calc(2 * var(--lh--1) * 1em);
+  display: flex;
+  align-items: flex-end;
+}
+.player-stat-main dd {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 2.25rem;
+  line-height: 1;
+  color: var(--ink);
+}
+.player-actions {
+  margin-top: auto;
+  padding-top: var(--s-3);
+  display: flex;
+  gap: var(--s-2);
+  flex-wrap: wrap;
+}
+.player-draw,
+.player-flip {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  font: inherit;
+  font-size: var(--step--1);
+  font-weight: 600;
+  min-height: 2.25rem;
+  padding: 0 0.75em;
+  border-radius: var(--radius-1);
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  transition: transform var(--t-press) var(--ease-out), background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
+}
+.player-draw {
+  flex: 1;
+  justify-content: center;
+  border: 2px solid var(--c);
+  background: transparent;
+  color: var(--c);
+}
+@media (hover: hover) {
+  .player-draw:hover {
+    background: color-mix(in oklab, var(--c) 10%, transparent);
+  }
+}
+.player-draw[aria-pressed="true"] {
+  background: var(--c);
+  color: var(--surface-2);
+}
+.player-flip {
+  border: var(--hairline-strong);
+  background: transparent;
+  color: inherit;
+}
+@media (hover: hover) {
+  .player-flip:hover {
+    background: var(--paper-deep);
+  }
+}
+.player-back .player-flip {
+  align-self: flex-start;
+  border-color: currentColor;
+  margin-top: var(--s-2);
+}
+@media (hover: hover) {
+  .player-back .player-flip:hover {
+    background: color-mix(in oklab, currentColor 10%, transparent);
+  }
+}
+.player-draw:active,
+.player-flip:active {
+  transform: scale(0.97);
+}
+.player-flip:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.flip-icon {
+  width: 1em;
+  height: 1em;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* ---------------- the back: two inks on board stock */
+.player-back-title {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 800;
+  text-transform: uppercase;
+  font-size: 1.3rem;
+  line-height: 1;
+  color: var(--card-red);
+}
+.player-back-title span {
+  color: inherit;
+  opacity: 0.75;
+}
+.season {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: var(--s-2);
+  font-size: 0.75rem;
+  font-variant-numeric: tabular-nums;
+}
+.season th,
+.season td {
+  padding: 0;
+  height: 1.3rem;
+  padding-left: var(--s-2);
+  text-align: right;
+  border-bottom: 1px solid color-mix(in oklab, currentColor 18%, transparent);
+  font-weight: 500;
+}
+.season th:first-child {
+  padding-left: 0;
+}
+.season th:first-child {
+  text-align: left;
+}
+.season thead th {
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: var(--label-tracking);
+  font-size: 0.625rem;
+  border-bottom: 2px solid currentColor;
+}
+.season td.out {
+  color: var(--card-red);
+  font-weight: 700;
+}
+.season tfoot th,
+.season tfoot td {
+  font-weight: 800;
+  color: var(--card-red);
+  border-bottom: 0;
+}
+.season-go {
+  all: unset;
+  cursor: pointer;
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 2px;
+  text-decoration-color: color-mix(in oklab, currentColor 40%, transparent);
+}
+@media (hover: hover) {
+  .season-go:hover {
+    text-decoration-color: currentColor;
+  }
+}
+.season-go:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 1px;
+  border-radius: 2px;
+}
+.season tr.is-current {
+  background: color-mix(in oklab, var(--mvp) 45%, transparent);
+}
+
+/* ---------------- phones: a horizontal rail you thumb through */
+@media (max-width: 1100px) {
+  .lineup-rail {
+    display: flex;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    overscroll-behavior-x: contain;
+    margin-inline: calc(var(--gutter) * -1);
+    padding-inline: var(--gutter);
+    scroll-padding-inline: var(--gutter);
+    scrollbar-width: none;
+  }
+  .lineup-rail::-webkit-scrollbar {
+    display: none;
+  }
+  .lineup-rail > li {
+    flex: 0 0 min(15.5rem, 72vw);
+    scroll-snap-align: start;
+  }
+}
+
+:root[data-density="terminal"] .lineup-head h2 {
+  font-size: var(--step-2);
+}
+:root[data-density="terminal"] .player-turn {
+  min-height: 21rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* no turning: the faces cross-fade in place */
+  .player-turn {
+    transform: none !important;
+    transition: none;
+  }
+  .player-back {
+    transform: none;
+  }
+  .player-face {
+    transition: opacity var(--t-mid) linear;
+  }
+  .player.is-flipped .player-front,
+  .player:not(.is-flipped) .player-back {
+    opacity: 0;
+    pointer-events: none;
+  }
+}
+
+/* ---------------- season pips: a preview of the back, one per replay */
+.pips {
+  display: flex;
+  gap: 4px;
+  margin-top: var(--s-3);
+}
+.pip {
+  flex: 1;
+  height: 0.6rem;
+  border-radius: 2px;
+  border: 1.5px solid var(--c);
+  background: transparent;
+}
+.pip.in {
+  background: var(--c);
+}
+.pip.now {
+  outline: 2px solid var(--mvp);
+  outline-offset: 1px;
+}
+.player-mvp {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+}
+
+/* ---------------- the strip: the cast, in the chart's toolbar */
+.strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--s-2);
+}
+.strip-player {
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-weight: 700;
+  font-size: 1.05rem;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  min-height: 2.25rem;
+  padding: 0 0.7em;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border-radius: var(--radius-1);
+  border: 2px solid var(--c);
+  background: var(--surface-2);
+  color: var(--c);
+  cursor: pointer;
+  transition: transform var(--t-press) var(--ease-out), background-color var(--t-fast) var(--ease-out), color var(--t-fast) var(--ease-out);
+}
+.strip-player:active {
+  transform: scale(0.97);
+}
+.strip-player[aria-pressed="true"] {
+  background: var(--c);
+  color: var(--surface-2);
+}
+@media (hover: hover) {
+  .strip-player[aria-pressed="false"]:hover {
+    background: color-mix(in oklab, var(--c) 10%, var(--surface-2));
+  }
+}
+.strip-line {
+  width: 1.4em;
+  height: 0.5em;
+  overflow: visible;
+}
+.strip-line path {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2.5;
+  stroke-linecap: round;
+}
+.strip-star {
+  color: var(--mvp);
+  stroke: var(--on-mvp);
+  stroke-width: 1;
+}
+.strip-player[aria-pressed="true"] .strip-star {
+  stroke: none;
+}

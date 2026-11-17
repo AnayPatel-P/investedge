@@ -1,0 +1,675 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-17T23:10:18.586572+00:00",
+  "title": "Design System: InvestEdge",
+  "extensions": {
+    "colorMeta": {
+      "shell": {
+        "role": "primary",
+        "displayName": "Shell Navy",
+        "canonical": "#1f2a60",
+        "tonalRamp": [
+          "#0c1126",
+          "#13193a",
+          "#19224d",
+          "#1f2a60",
+          "#626a90",
+          "#9a9fb7",
+          "#c7cad7",
+          "#e9eaef"
+        ]
+      },
+      "shell-2": {
+        "role": "primary",
+        "displayName": "Shell Navy Raised",
+        "canonical": "#2a3775",
+        "tonalRamp": [
+          "#11162f",
+          "#192146",
+          "#222c5e",
+          "#2a3775",
+          "#6a739e",
+          "#9fa5c1",
+          "#cacddc",
+          "#eaebf1"
+        ]
+      },
+      "on-shell": {
+        "role": "primary",
+        "displayName": "Shell Text",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#666666",
+          "#999999",
+          "#cccccc",
+          "#ffffff",
+          "#ffffff",
+          "#ffffff",
+          "#ffffff",
+          "#ffffff"
+        ]
+      },
+      "on-shell-muted": {
+        "role": "primary",
+        "displayName": "Shell Muted",
+        "canonical": "#b9c1e6",
+        "tonalRamp": [
+          "#4a4d5c",
+          "#6f748a",
+          "#949ab8",
+          "#b9c1e6",
+          "#ced4ee",
+          "#e0e3f4",
+          "#eef0f9",
+          "#f8f9fc"
+        ]
+      },
+      "reality": {
+        "role": "primary",
+        "displayName": "Reality Ink",
+        "canonical": "#1f2a60",
+        "tonalRamp": [
+          "#0c1126",
+          "#13193a",
+          "#19224d",
+          "#1f2a60",
+          "#626a90",
+          "#9a9fb7",
+          "#c7cad7",
+          "#e9eaef"
+        ]
+      },
+      "mvp-gold": {
+        "role": "secondary",
+        "displayName": "MVP Gold",
+        "canonical": "#f2b705",
+        "tonalRamp": [
+          "#614902",
+          "#916e03",
+          "#c29204",
+          "#f2b705",
+          "#f6cd50",
+          "#f9df8e",
+          "#fcedc0",
+          "#fef8e6"
+        ]
+      },
+      "model-naive": {
+        "role": "tertiary",
+        "displayName": "Naive Slate",
+        "canonical": "#5c6470",
+        "tonalRamp": [
+          "#25282d",
+          "#373c43",
+          "#4a505a",
+          "#5c6470",
+          "#8d929b",
+          "#b6b9bf",
+          "#d6d8db",
+          "#eff0f1"
+        ]
+      },
+      "model-arima": {
+        "role": "tertiary",
+        "displayName": "ARIMA Burnt Orange",
+        "canonical": "#c2540a",
+        "tonalRamp": [
+          "#541910",
+          "#7e2618",
+          "#a83220",
+          "#c2540a",
+          "#e07968",
+          "#eba99e",
+          "#f4cfc9",
+          "#faecea"
+        ]
+      },
+      "model-ets": {
+        "role": "tertiary",
+        "displayName": "ETS Kelly",
+        "canonical": "#1b8048",
+        "tonalRamp": [
+          "#0b331d",
+          "#104d2b",
+          "#16663a",
+          "#1b8048",
+          "#5fa67f",
+          "#98c6ad",
+          "#c6dfd1",
+          "#e8f2ed"
+        ]
+      },
+      "model-prophet": {
+        "role": "tertiary",
+        "displayName": "Prophet Violet",
+        "canonical": "#6247d1",
+        "tonalRamp": [
+          "#271c54",
+          "#3b2b7d",
+          "#4e39a7",
+          "#6247d1",
+          "#917edf",
+          "#b8acea",
+          "#d8d1f4",
+          "#efedfa"
+        ]
+      },
+      "model-garch": {
+        "role": "tertiary",
+        "displayName": "GARCH Gold Ink",
+        "canonical": "#a87700",
+        "tonalRamp": [
+          "#433000",
+          "#654700",
+          "#865f00",
+          "#a87700",
+          "#c2a04c",
+          "#d8c28c",
+          "#e9ddbf",
+          "#f6f1e6"
+        ]
+      },
+      "model-garch-bright": {
+        "role": "tertiary",
+        "displayName": "GARCH Bright",
+        "canonical": "#f2b705",
+        "tonalRamp": [
+          "#614902",
+          "#916e03",
+          "#c29204",
+          "#f2b705",
+          "#f6cd50",
+          "#f9df8e",
+          "#fcedc0",
+          "#fef8e6"
+        ]
+      },
+      "card-stock": {
+        "role": "tertiary",
+        "displayName": "Card Stock",
+        "canonical": "#e8e5dc",
+        "tonalRamp": [
+          "#5d5c58",
+          "#8b8984",
+          "#bab7b0",
+          "#e8e5dc",
+          "#efede6",
+          "#f5f3ef",
+          "#f9f8f6",
+          "#fdfcfc"
+        ]
+      },
+      "card-red": {
+        "role": "tertiary",
+        "displayName": "Card Red",
+        "canonical": "#b02f25",
+        "tonalRamp": [
+          "#46130f",
+          "#6a1c16",
+          "#8d261e",
+          "#b02f25",
+          "#c86d66",
+          "#dba19d",
+          "#ebcbc8",
+          "#f7eae9"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "canonical": "#f5f6f8",
+        "tonalRamp": [
+          "#626263",
+          "#939495",
+          "#c4c5c6",
+          "#f5f6f8",
+          "#f8f9fa",
+          "#fafbfc",
+          "#fcfdfd",
+          "#fefefe"
+        ]
+      },
+      "paper-deep": {
+        "role": "neutral",
+        "displayName": "Paper Deep",
+        "canonical": "#e7eaf0",
+        "tonalRamp": [
+          "#5c5e60",
+          "#8b8c90",
+          "#b9bbc0",
+          "#e7eaf0",
+          "#eef0f4",
+          "#f4f6f8",
+          "#f9fafb",
+          "#fdfdfe"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "canonical": "#fbfcfd",
+        "tonalRamp": [
+          "#646565",
+          "#979798",
+          "#c9caca",
+          "#fbfcfd",
+          "#fcfdfe",
+          "#fdfefe",
+          "#fefefe",
+          "#ffffff"
+        ]
+      },
+      "surface-2": {
+        "role": "neutral",
+        "displayName": "Surface 2",
+        "canonical": "#ffffff",
+        "tonalRamp": [
+          "#666666",
+          "#999999",
+          "#cccccc",
+          "#ffffff",
+          "#ffffff",
+          "#ffffff",
+          "#ffffff",
+          "#ffffff"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "canonical": "#161c3a",
+        "tonalRamp": [
+          "#090b17",
+          "#0d1123",
+          "#12162e",
+          "#161c3a",
+          "#5c6075",
+          "#9699a6",
+          "#c5c6ce",
+          "#e8e8eb"
+        ]
+      },
+      "ink-soft": {
+        "role": "neutral",
+        "displayName": "Ink Soft",
+        "canonical": "#343c5c",
+        "tonalRamp": [
+          "#151825",
+          "#1f2437",
+          "#2a304a",
+          "#343c5c",
+          "#71768d",
+          "#a4a7b6",
+          "#ccced6",
+          "#ebecef"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "canonical": "#565d75",
+        "tonalRamp": [
+          "#22252f",
+          "#343846",
+          "#454a5e",
+          "#565d75",
+          "#898e9e",
+          "#b3b6c1",
+          "#d5d6dc",
+          "#eeeff1"
+        ]
+      },
+      "rule": {
+        "role": "neutral",
+        "displayName": "Rule",
+        "canonical": "#d9dde6",
+        "tonalRamp": [
+          "#57585c",
+          "#82858a",
+          "#aeb1b8",
+          "#d9dde6",
+          "#e4e7ee",
+          "#eef0f4",
+          "#f6f6f9",
+          "#fbfcfc"
+        ]
+      },
+      "rule-strong": {
+        "role": "neutral",
+        "displayName": "Rule Strong",
+        "canonical": "#b3b9c8",
+        "tonalRamp": [
+          "#484a50",
+          "#6b6f78",
+          "#8f94a0",
+          "#b3b9c8",
+          "#caced8",
+          "#dde0e6",
+          "#eceef1",
+          "#f7f8fa"
+        ]
+      },
+      "forecast-pencil": {
+        "role": "neutral",
+        "displayName": "Forecast Pencil",
+        "canonical": "#7d8591",
+        "tonalRamp": [
+          "#32353a",
+          "#4b5057",
+          "#646a74",
+          "#7d8591",
+          "#a4aab2",
+          "#c4c8ce",
+          "#dee0e4",
+          "#f2f3f4"
+        ]
+      },
+      "up": {
+        "role": "neutral",
+        "displayName": "Up / Good",
+        "canonical": "#1b7a55",
+        "tonalRamp": [
+          "#0b3122",
+          "#104933",
+          "#166244",
+          "#1b7a55",
+          "#5fa288",
+          "#98c3b2",
+          "#c6ded4",
+          "#e8f2ee"
+        ]
+      },
+      "down": {
+        "role": "neutral",
+        "displayName": "Down / Outside",
+        "canonical": "#c03a26",
+        "tonalRamp": [
+          "#4d170f",
+          "#732317",
+          "#9a2e1e",
+          "#c03a26",
+          "#d37567",
+          "#e3a69d",
+          "#efcec9",
+          "#f9ebe9"
+        ]
+      },
+      "possible": {
+        "role": "neutral",
+        "displayName": "Possible",
+        "canonical": "#8a6414",
+        "tonalRamp": [
+          "#372808",
+          "#533c0c",
+          "#6e5010",
+          "#8a6414",
+          "#ad925a",
+          "#cab995",
+          "#e2d8c4",
+          "#f3f0e8"
+        ]
+      },
+      "focus": {
+        "role": "neutral",
+        "displayName": "Focus Ring",
+        "canonical": "#3550c8",
+        "tonalRamp": [
+          "#152050",
+          "#203078",
+          "#2a40a0",
+          "#3550c8",
+          "#7284d8",
+          "#a4b0e6",
+          "#ccd3f1",
+          "#ebeefa"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "price": {
+        "displayName": "Price",
+        "purpose": "The last price on the stock page; the largest type on any page."
+      },
+      "display": {
+        "displayName": "Display",
+        "purpose": "Barlow Condensed italic 800 uppercase: player names, tickers, wordmark, lineup title, ledger symbols."
+      },
+      "headline": {
+        "displayName": "Headline",
+        "purpose": "h1/h2 section and page heads in Barlow Condensed."
+      },
+      "title": {
+        "displayName": "Title",
+        "purpose": "h3, ledes, the tally line, company name."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Explanation, 68ch measure."
+      },
+      "label": {
+        "displayName": "Label",
+        "purpose": "Controls, stat terms, status; uppercase only as a field label for an adjacent value or control."
+      },
+      "stat": {
+        "displayName": "Stat",
+        "purpose": "The single headline number on a player card."
+      }
+    },
+    "shadows": [
+      {
+        "name": "lift",
+        "value": "0 1px 2px rgba(26,34,48,0.06), 0 6px 16px -8px rgba(26,34,48,0.18)",
+        "purpose": "Player card fronts and the replay tally card."
+      },
+      {
+        "name": "lift-2",
+        "value": "0 1px 2px rgba(26,34,48,0.06), 0 18px 40px -18px rgba(26,34,48,0.28)",
+        "purpose": "Popovers (search results)."
+      },
+      {
+        "name": "focus-halo",
+        "value": "0 0 0 3px var(--paper), 0 0 0 5px var(--c)",
+        "purpose": "The focused model's card, ringed in its team colour."
+      },
+      {
+        "name": "pressed-segment",
+        "value": "0 1px 2px rgba(26,34,48,0.12)",
+        "purpose": "Selected segment in a segmented control."
+      }
+    ],
+    "motion": [
+      {
+        "name": "ease-out",
+        "value": "cubic-bezier(0.2, 0.8, 0.2, 1)",
+        "purpose": "Default easing for CSS state changes."
+      },
+      {
+        "name": "t-press",
+        "value": "100ms",
+        "purpose": "Press scale (0.97) on buttons; 0ms under reduced motion."
+      },
+      {
+        "name": "t-fast",
+        "value": "160ms",
+        "purpose": "Hover colour and border changes."
+      },
+      {
+        "name": "t-mid",
+        "value": "240ms",
+        "purpose": "Card focus and lift changes; 120ms cross-fade under reduced motion."
+      },
+      {
+        "name": "t-slow",
+        "value": "360ms",
+        "purpose": "Density switch cross-fade, drum actions materialising."
+      },
+      {
+        "name": "card-flip",
+        "value": "560ms cubic-bezier(0.3, 1.32, 0.5, 1)",
+        "purpose": "Player card y-turn with slight overshoot; reversible mid-turn."
+      },
+      {
+        "name": "spring-drum",
+        "value": "damping 1, response 0.55s",
+        "purpose": "Drum turning to a picked date (chart/spring.ts)."
+      },
+      {
+        "name": "spring-settle",
+        "value": "damping 1, response 0.35s",
+        "purpose": "Settling onto a month line after a slow drag."
+      },
+      {
+        "name": "spring-flick",
+        "value": "damping 0.82, response 0.45s",
+        "purpose": "Momentum after a flick; small overshoot allowed."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "masthead-compact",
+        "value": "480px"
+      },
+      {
+        "name": "masthead-static",
+        "value": "640px"
+      },
+      {
+        "name": "masthead-stack",
+        "value": "900px"
+      },
+      {
+        "name": "lineup-rail",
+        "value": "1100px"
+      },
+      {
+        "name": "container",
+        "value": "1280px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Button",
+      "kind": "button",
+      "refersTo": "button",
+      "description": "Default quiet button: surface fill, hairline, press scale.",
+      "html": "<button class=\"ds-btn\">Patterns</button>",
+      "css": ".ds-btn{display:inline-flex;align-items:center;gap:8px;min-height:2.25rem;padding:0 .9em;border:1px solid var(--rule-strong,#b3b9c8);background:var(--surface,#fbfcfd);color:var(--ink,#161c3a);border-radius:6px;font:inherit;font-size:.8125rem;font-weight:550;cursor:pointer;transition:border-color 160ms cubic-bezier(.2,.8,.2,1),transform 100ms cubic-bezier(.2,.8,.2,1)}.ds-btn:hover{border-color:var(--ink-soft,#343c5c)}.ds-btn:active{transform:scale(.97)}.ds-btn:focus-visible{outline:2px solid var(--focus,#3550c8);outline-offset:3px}"
+    },
+    {
+      "name": "Primary Button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Ink-filled button for the pressed or primary action.",
+      "html": "<button class=\"ds-btn-primary\">Redraw futures</button>",
+      "css": ".ds-btn-primary{display:inline-flex;align-items:center;min-height:2.25rem;padding:0 .9em;border:1px solid var(--ink,#161c3a);background:var(--ink,#161c3a);color:var(--paper,#f5f6f8);border-radius:6px;font:inherit;font-size:.8125rem;font-weight:550;cursor:pointer;transition:transform 100ms cubic-bezier(.2,.8,.2,1)}.ds-btn-primary:active{transform:scale(.97)}.ds-btn-primary:focus-visible{outline:2px solid var(--focus,#3550c8);outline-offset:3px}"
+    },
+    {
+      "name": "Segmented Control",
+      "kind": "chip",
+      "refersTo": "segmented-on",
+      "description": "Range and level switch: recessed track, white pressed segment.",
+      "html": "<div class=\"ds-seg\"><button>1M</button><button aria-pressed=\"true\">6M</button><button>1Y</button><button>5Y</button></div>",
+      "css": ".ds-seg{display:inline-flex;padding:2px;gap:2px;background:var(--paper-deep,#e7eaf0);border-radius:8px}.ds-seg button{border:0;border-radius:6px;background:transparent;min-height:2rem;padding:0 .75em;font:inherit;font-size:.8125rem;font-weight:550;color:var(--ink-soft,#343c5c);cursor:pointer;font-variant-numeric:tabular-nums;transition:background-color 160ms,transform 100ms}.ds-seg button:hover{color:var(--ink,#161c3a)}.ds-seg button:active{transform:scale(.96)}.ds-seg button[aria-pressed=true]{background:#fff;color:var(--ink,#161c3a);box-shadow:0 1px 2px rgba(26,34,48,.12)}.ds-seg button:focus-visible{outline:2px solid var(--focus,#3550c8);outline-offset:2px}"
+    },
+    {
+      "name": "Model Strip Button",
+      "kind": "chip",
+      "refersTo": "strip-player",
+      "description": "A model in the chart toolbar, in its team colour; pressed = drawing the futures.",
+      "html": "<div style=\"display:flex;gap:8px\"><button class=\"ds-strip\" style=\"--c:#c2540a\" aria-pressed=\"true\"><svg width=\"20\" height=\"7\" viewBox=\"0 0 24 8\"><path d=\"M1 4h22\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-dasharray=\"6 3\" fill=\"none\"/></svg>ARIMA</button><button class=\"ds-strip\" style=\"--c:#1b8048\" aria-pressed=\"false\"><svg width=\"20\" height=\"7\" viewBox=\"0 0 24 8\"><path d=\"M1 4h22\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-dasharray=\"10 3 2 3\" fill=\"none\"/></svg>ETS</button></div>",
+      "css": ".ds-strip{font-family:var(--font-display, \"Barlow Condensed\", \"Arial Narrow\", sans-serif);font-style:italic;font-weight:700;font-size:1.05rem;text-transform:uppercase;letter-spacing:.02em;min-height:2.25rem;padding:0 .7em;display:inline-flex;align-items:center;gap:6px;border-radius:6px;border:2px solid var(--c);background:#fff;color:var(--c);cursor:pointer;transition:transform 100ms,background-color 160ms,color 160ms}.ds-strip:hover{background:color-mix(in oklab,var(--c) 10%,#fff)}.ds-strip[aria-pressed=true]{background:var(--c);color:#fff}.ds-strip:active{transform:scale(.97)}.ds-strip:focus-visible{outline:2px solid var(--focus,#3550c8);outline-offset:3px}"
+    },
+    {
+      "name": "Player Card",
+      "kind": "card",
+      "refersTo": "player-card-front",
+      "description": "Signature: a model's card front with team border, name, headline stat, pips and MVP badge.",
+      "html": "<article class=\"ds-player\" style=\"--c:#5c6470\"><span class=\"ds-mvp\">&#9733; MVP</span><div class=\"ds-pname\">Naive guess</div><div class=\"ds-ppos\">Says the price stays put</div><dl class=\"ds-pstats\"><div class=\"ds-pmain\"><dt>Landed inside its band</dt><dd>10 of 12</dd></div><div><dt>Typical miss</dt><dd>4.1%</dd></div></dl><div class=\"ds-pips\"><i class=\"in\"></i><i class=\"in\"></i><i></i><i class=\"in\"></i><i class=\"in now\"></i></div><div class=\"ds-pact\"><button class=\"ds-draw\" aria-pressed=\"true\">Drawing</button><button class=\"ds-flip\">Season</button></div></article>",
+      "css": ".ds-player{position:relative;width:15rem;background:#fff;border:6px solid var(--c);border-radius:10px;padding:16px 16px 12px;box-shadow:0 1px 2px rgba(26,34,48,.06),0 6px 16px -8px rgba(26,34,48,.18);display:flex;flex-direction:column;gap:4px;color:var(--ink,#161c3a)}.ds-mvp{position:absolute;top:-15px;right:-12px;background:#f2b705;color:#1f2a60;font-family:var(--font-display, \"Barlow Condensed\", \"Arial Narrow\", sans-serif);font-style:italic;font-weight:800;font-size:1rem;letter-spacing:.04em;line-height:1;padding:7px 10px 6px;border-radius:999px;border:3px solid #fff;box-shadow:0 2px 6px -2px rgba(22,28,58,.4);transform:rotate(6deg)}.ds-pname{font-family:var(--font-display, \"Barlow Condensed\", \"Arial Narrow\", sans-serif);font-style:italic;font-weight:800;font-size:1.85rem;line-height:.95;text-transform:uppercase;color:var(--c)}.ds-ppos{font-size:.8125rem;color:var(--muted,#565d75)}.ds-pstats{margin:8px 0 0;display:grid;gap:8px}.ds-pstats div{display:flex;justify-content:space-between;align-items:baseline;border-top:1px solid #d9dde6;padding-top:8px;font-size:.8125rem}.ds-pstats dt{color:#565d75}.ds-pstats dd{margin:0;font-weight:650;font-variant-numeric:tabular-nums}.ds-pstats .ds-pmain{display:grid;border:0;padding:0}.ds-pmain dd{font-family:var(--font-display, \"Barlow Condensed\", \"Arial Narrow\", sans-serif);font-weight:700;font-size:2.25rem;line-height:1}.ds-pips{display:flex;gap:4px;margin-top:12px}.ds-pips i{flex:1;height:.6rem;border-radius:2px;border:1.5px solid var(--c)}.ds-pips i.in{background:var(--c)}.ds-pips i.now{outline:2px solid #f2b705;outline-offset:1px}.ds-pact{display:flex;gap:8px;margin-top:12px}.ds-draw,.ds-flip{font:inherit;font-size:.8125rem;font-weight:600;min-height:2.25rem;padding:0 .75em;border-radius:6px;cursor:pointer;transition:transform 100ms,background-color 160ms}.ds-draw{flex:1;border:2px solid var(--c);background:transparent;color:var(--c)}.ds-draw:hover{background:color-mix(in oklab,var(--c) 10%,transparent)}.ds-draw[aria-pressed=true]{background:var(--c);color:#fff}.ds-flip{border:1px solid #b3b9c8;background:transparent;color:inherit}.ds-flip:hover{background:#e7eaf0}.ds-draw:active,.ds-flip:active{transform:scale(.97)}.ds-draw:focus-visible,.ds-flip:focus-visible{outline:2px solid #3550c8;outline-offset:3px}"
+    },
+    {
+      "name": "Player Card Back",
+      "kind": "card",
+      "refersTo": "player-card-back",
+      "description": "Signature: the season, two inks on grey board stock; each date rewinds the drum.",
+      "html": "<article class=\"ds-back\" style=\"--c:#c2540a\"><div class=\"ds-btitle\">ARIMA <span>season</span></div><table class=\"ds-season\"><thead><tr><th>Replay</th><th>Miss</th><th>Band</th></tr></thead><tbody><tr><th><button class=\"ds-go\">Dec 31 &#8217;25</button></th><td>3.2%</td><td>in</td></tr><tr class=\"cur\"><th><button class=\"ds-go\">Jan 30 &#8217;26</button></th><td>5.8%</td><td>in</td></tr><tr><th><button class=\"ds-go\">Feb 27 &#8217;26</button></th><td class=\"out\">11.4%</td><td class=\"out\">out</td></tr></tbody><tfoot><tr><th>Season</th><td>6.8%</td><td>2/3</td></tr></tfoot></table></article>",
+      "css": ".ds-back{width:15rem;background:#e8e5dc;color:#1f2a60;border:6px solid var(--c);border-radius:10px;padding:12px 12px 8px}.ds-btitle{font-family:var(--font-display, \"Barlow Condensed\", \"Arial Narrow\", sans-serif);font-style:italic;font-weight:800;text-transform:uppercase;font-size:1.3rem;line-height:1;color:#b02f25}.ds-btitle span{opacity:.75}.ds-season{width:100%;border-collapse:collapse;margin-top:8px;font-size:.75rem;font-variant-numeric:tabular-nums}.ds-season th,.ds-season td{height:1.3rem;padding:0 0 0 8px;text-align:right;border-bottom:1px solid color-mix(in oklab,currentColor 18%,transparent);font-weight:500}.ds-season th:first-child{padding-left:0;text-align:left}.ds-season thead th{font-weight:700;text-transform:uppercase;letter-spacing:.05em;font-size:.625rem;border-bottom:2px solid currentColor}.ds-season .out{color:#b02f25;font-weight:700}.ds-season tfoot th,.ds-season tfoot td{font-weight:800;color:#b02f25;border-bottom:0}.ds-season tr.cur{background:color-mix(in oklab,#f2b705 45%,transparent)}.ds-go{all:unset;cursor:pointer;font-weight:600;text-decoration:underline;text-decoration-thickness:1px;text-underline-offset:2px;text-decoration-color:color-mix(in oklab,currentColor 40%,transparent)}.ds-go:hover{text-decoration-color:currentColor}.ds-go:focus-visible{outline:2px solid #3550c8;outline-offset:1px;border-radius:2px}"
+    },
+    {
+      "name": "Masthead",
+      "kind": "nav",
+      "refersTo": "masthead",
+      "description": "Opaque navy shell: wordmark with gold swoosh, nav with gold active underline, navy search well.",
+      "html": "<header class=\"ds-mast\"><a class=\"ds-wm\" href=\"#\"><span class=\"ds-wmn\">InvestEdge</span><span class=\"ds-wmt\">every forecast, checked against reality</span></a><nav class=\"ds-nav\"><a class=\"on\" href=\"#\">Stocks</a><a href=\"#\">Example portfolios</a></nav><input class=\"ds-search\" placeholder=\"Search a stock\"></header>",
+      "css": ".ds-mast{background:#1f2a60;color:#fff;display:flex;align-items:center;gap:24px;padding:12px 24px}.ds-wm{display:flex;flex-direction:column;line-height:1;color:#fff;text-decoration:none}.ds-wmn{font-family:var(--font-display, \"Barlow Condensed\", \"Arial Narrow\", sans-serif);font-style:italic;font-weight:800;font-size:1.6rem;text-transform:uppercase}.ds-wmn::after{content:'';display:block;height:3px;width:62%;margin-top:2px;background:#f2b705;border-radius:2px;transform:skewX(-20deg)}.ds-wmt{font-size:.8125rem;color:#b9c1e6;margin-top:5px}.ds-nav{display:flex;gap:16px;font-size:.8125rem}.ds-nav a{text-decoration:none;padding:4px 0;font-weight:600;color:#b9c1e6;border-bottom:2px solid transparent;transition:color 160ms}.ds-nav a:hover{color:#fff}.ds-nav a.on{color:#fff;border-bottom-color:#f2b705}.ds-search{flex:1;max-width:420px;margin-left:auto;font:inherit;font-size:.8125rem;min-height:2.25rem;padding:0 .8em;border:1px solid transparent;border-radius:10px;background:#2a3775;color:#fff}.ds-search::placeholder{color:#b9c1e6}.ds-search:focus{background:#fff;color:#161c3a;outline:2px solid #f2b705;outline-offset:1px}"
+    },
+    {
+      "name": "Select Field",
+      "kind": "input",
+      "description": "Filter select on the ground: surface fill, strong hairline, 10px radius.",
+      "html": "<label class=\"ds-field\"><span>Sector</span><select class=\"ds-select\"><option>All 11 sectors</option></select></label>",
+      "css": ".ds-field{display:grid;gap:2px}.ds-field span{font-size:.8125rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:#565d75}.ds-select{font:inherit;font-size:.8125rem;min-height:2.25rem;padding:0 .6em;border:1px solid #b3b9c8;border-radius:10px;background:#fbfcfd;color:#161c3a}.ds-select:hover{border-color:#343c5c}.ds-select:focus-visible{outline:2px solid #3550c8;outline-offset:3px}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Lineup",
+    "overview": "Forecasting models are players with a public record. Every model has a team colour, and it wears that colour everywhere it appears: its card border, its name, its button in the chart toolbar, and the futures it draws on the drum. Reality is heavy navy ink. The page is a cool neutral ground under an opaque navy shell, so the only saturated colour on screen belongs to a model or to the MVP's gold.\n\nThe chart keeps the Recording Drum mechanics: the price history turns like a drum under the finger, settles on damped springs, and a chosen replay rewinds it so reality inks in over an old forecast. The lineup is the drum's cast, not a separate chapter; it sits directly under the ruler. Each card flips (a spring-like y-turn that can be caught mid-turn) to a two-ink season table on grey board stock, and every season row is a replay that turns the drum.\n\nDensity has two modes from one token set: Guided (default, roomy, light) and Terminal (a night-game version: navy-black ground, brighter team colours, tighter steps). Terminal is a recolouring of the same world, never an inversion of it.",
+    "keyCharacteristics": [
+      "Colour is owned by the five models; chrome is navy, neutral, or ink.",
+      "One condensed athletic face (Barlow Condensed, italic 800) for names, tickers and titles; system UI with tabular numbers for everything read or compared.",
+      "The price is the largest thing on the stock page, set light (300) in the system face.",
+      "Cards are the one lifted surface; everything else is flat with hairlines.",
+      "Motion is calm and physical: springs for the drum, a slight-overshoot turn for cards, press-scale on every button, instant cross-fades under reduced motion."
+    ],
+    "rules": [
+      {
+        "name": "The Team Colour Rule",
+        "body": "A model's colour (`--m-<model>`) appears only where that model is speaking: its card, its toolbar button, its line, its swatch. Components take it through a local `--c` custom property, never a hard-coded hex. No chrome, heading or illustration borrows a team colour.",
+        "section": "colors"
+      },
+      {
+        "name": "The One Gold Rule",
+        "body": "Gold means MVP or \"you are here\". It is never a generic highlight or a warning colour.",
+        "section": "colors"
+      },
+      {
+        "name": "The Reality Is Ink Rule",
+        "body": "The real price is always heavy navy (light mode) or white (Terminal), drawn at 2px; forecasts never take that colour.",
+        "section": "colors"
+      },
+      {
+        "name": "The Names, Not Sentences Rule",
+        "body": "Barlow Condensed is for names, tickers, titles and single headline numbers. Paragraphs, labels, table cells and buttons are set in the system face.",
+        "section": "typography"
+      },
+      {
+        "name": "The Tabular Figures Rule",
+        "body": "Every number that can change or be compared uses `font-variant-numeric: tabular-nums` so columns align and live values do not jitter.",
+        "section": "typography"
+      },
+      {
+        "name": "The Lift-Is-A-Card Rule",
+        "body": "Only cards and popovers cast shadows. Panels and the drum sit on the ground with a border or inset hairline. In Terminal, surfaces lift by lightness and `--lift` is none.",
+        "section": "elevation"
+      }
+    ],
+    "dos": [
+      "**Do** pass a model's colour into a component as `--c: var(--m-<model>)` and style borders, names, lines and pressed fills from `--c`.",
+      "**Do** pair every model colour with its dash pattern (naive 2 3, ARIMA 6 3, ETS 10 3 2 3, Prophet 1 4, GARCH 12 4) so lines read without colour.",
+      "**Do** set tickers, player names and the wordmark in Barlow Condensed italic 800 uppercase; set everything read or compared in the system face with tabular numbers.",
+      "**Do** keep the price the largest element on the stock page, light weight (300).",
+      "**Do** give every button a 0.97 press scale on `--t-press` (100ms) and every hover a `--t-fast` (160ms) colour change on `cubic-bezier(0.2, 0.8, 0.2, 1)`.",
+      "**Do** provide a reduced-motion path for every movement: cross-fades replace turns and slides, transition tokens drop to 0 to 160ms.",
+      "**Do** derive Terminal by swapping tokens under `:root[data-density=\"terminal\"]`, never by writing separate component styles."
+    ],
+    "donts": [
+      "**Don't** use a team colour, or gold, for chrome, headings, links or generic emphasis.",
+      "**Don't** draw a forecast in navy ink; reality owns that colour.",
+      "**Don't** add shadows to panels, the drum or rows; only cards and popovers lift.",
+      "**Don't** set body copy, labels or table cells in Barlow Condensed.",
+      "**Don't** use a sweeping shimmer for loading; skeletons are still paper-deep blocks that breathe once a second.",
+      "**Don't** put a translucent blur behind the shell; it stays opaque so team colours never sit on a tinted ground."
+    ]
+  }
+}

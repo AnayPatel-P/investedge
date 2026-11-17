@@ -128,7 +128,7 @@ export function Dial<T extends string | number>({ label, options, value, onChang
         ))}
       </div>
       <div className="dial-readout">
-        <span className="kicker">{label}</span>
+        <span className="dial-label">{label}</span>
         <span className="dial-value">{options[index].label}</span>
         {caption && <span className="dial-caption muted">{caption}</span>}
       </div>

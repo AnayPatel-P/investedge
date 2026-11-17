@@ -69,7 +69,6 @@ export function ProfilePicker() {
 
   return (
     <section className="picker" aria-labelledby="picker-title">
-      <p className="kicker">Before we start</p>
       <h1 id="picker-title" className="picker-title">
         How do you feel about <em>swings</em>?
       </h1>
@@ -95,8 +94,9 @@ export function ProfilePicker() {
             ))}
           </svg>
           <figcaption>
-            <span className="kicker">How bumpy the ride feels</span>
-            <span>{COPY[choice].swing}</span>
+            <span>
+              <strong>How bumpy the ride feels:</strong> {COPY[choice].swing}
+            </span>
           </figcaption>
         </figure>
       </div>
@@ -108,7 +108,7 @@ export function ProfilePicker() {
             setProfile(choice);
             window.scrollTo(0, 0);
           }}>
-          Use {OPTIONS.find((o) => o.value === choice)!.label.toLowerCase()} →
+          Use {OPTIONS.find((o) => o.value === choice)!.label.toLowerCase()}
         </button>
         <button type="button" className="btn" aria-expanded={quizOpen} onClick={() => setQuizOpen((v) => !v)}>
           Not sure? Take a 3-question quiz

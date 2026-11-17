@@ -93,7 +93,6 @@ export function PatternPanel({ data, selected, symbol }: { data: Patterns; selec
   return (
     <section className="patterns" aria-labelledby="patterns-title">
       <header>
-        <p className="kicker">Candlestick patterns</p>
         <h2 id="patterns-title">Do the famous shapes mean anything for {symbol}?</h2>
         <p className="patterns-lede muted">
           Traders give names to certain <Term k="candlestick">candle</Term> shapes and expect the price to move a certain way afterwards. Below, each shape is
@@ -117,7 +116,7 @@ export function PatternPanel({ data, selected, symbol }: { data: Patterns; selec
                 <div>
                   <h3>{p.name}</h3>
                   <p className={`pc-bias mono ${p.bias === "bullish" ? "up" : p.bias === "bearish" ? "down" : "muted"}`}>
-                    {p.bias === "bullish" ? "▲ traders expect a rise" : p.bias === "bearish" ? "▼ traders expect a fall" : "■ traders read it as indecision"}
+                    {p.bias === "bullish" ? "Traders expect a rise" : p.bias === "bearish" ? "Traders expect a fall" : "Traders read it as indecision"}
                   </p>
                 </div>
               </div>

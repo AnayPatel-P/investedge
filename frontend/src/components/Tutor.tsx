@@ -37,8 +37,7 @@ export function Tutor({ symbol, profile }: { symbol: string; profile: ProfileKey
   return (
     <section className="tutor" aria-labelledby="tutor-title">
       <header className="tutor-head">
-        <p className="kicker">AI tutor</p>
-        <h2 id="tutor-title">Ask about {symbol}</h2>
+        <h2 id="tutor-title">Ask the AI tutor about {symbol}</h2>
         <p className="tutor-note muted">
           Written by Claude from the numbers on this page. It explains — it never tells you to buy or sell. It can be wrong;
           the charts and tables above are the source of truth.
@@ -80,7 +79,7 @@ function Briefing({ symbol, profile }: { symbol: string; profile: ProfileKey }) 
   const { data, isLoading, error } = useSummary(symbol, profile, true);
   return (
     <div className="briefing" aria-live="polite" aria-busy={isLoading}>
-      <p className="kicker">Briefing for {profile === "aggressive" ? "an" : "a"} {profile} investor</p>
+      <h3 className="briefing-title">Briefing for {profile === "aggressive" ? "an" : "a"} {profile} investor</h3>
       {isLoading && (
         <div aria-hidden="true" className="briefing-skeleton">
           {[92, 100, 96, 70].map((w, i) => (

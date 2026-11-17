@@ -22,8 +22,9 @@
 .pf-disclaimer {
   margin: var(--s-5) 0;
   padding: var(--s-3) var(--s-4);
-  border-left: 3px solid var(--down);
-  background: var(--surface);
+  border: 1px solid color-mix(in oklab, var(--down) 45%, transparent);
+  border-radius: var(--radius-2);
+  background: color-mix(in oklab, var(--down) 6%, var(--surface));
   font-size: var(--step--1);
 }
 .pf-swing {
@@ -39,6 +40,7 @@
 }
 .swingbar-label {
   font-family: var(--font-display);
+  font-weight: 700;
   font-size: var(--step-1);
 }
 .swingbar-track {
@@ -55,10 +57,13 @@
   animation: grow var(--t-slow) var(--ease-out) both;
 }
 .single .swingbar-fill {
-  background: repeating-linear-gradient(90deg, var(--ink-soft) 0 2px, transparent 2px 5px);
+  background: repeating-linear-gradient(135deg, var(--down) 0 3px, transparent 3px 6px);
+  border: 1.5px solid var(--down);
+  border-radius: 3px;
 }
 .basket .swingbar-fill {
-  background: var(--forecast);
+  background: var(--shell);
+  border-radius: 3px;
   animation-delay: 250ms;
 }
 @keyframes grow {

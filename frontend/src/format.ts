@@ -5,12 +5,12 @@ export const price = (v: number | null | undefined) =>
 
 export const pct = (v: number | null | undefined, digits = 1) => (isNum(v) ? `${(v * 100).toFixed(digits)}%` : "—");
 
-/** Signed percent with a direction glyph, so direction never depends on color alone. */
+/** Signed percent with a plus or minus sign, so direction never depends on colour alone. */
 export const signedPct = (v: number | null | undefined, digits = 1) => {
   if (!isNum(v)) return { text: "—", dir: "flat" as const };
   const dir = v > 0 ? ("up" as const) : v < 0 ? ("down" as const) : ("flat" as const);
-  const glyph = dir === "up" ? "▲" : dir === "down" ? "▼" : "■";
-  return { text: `${glyph} ${Math.abs(v * 100).toFixed(digits)}%`, dir };
+  const sign = dir === "up" ? "+" : dir === "down" ? "\u2212" : "±";
+  return { text: `${sign}${Math.abs(v * 100).toFixed(digits)}%`, dir };
 };
 
 export const num = (v: number | null | undefined, digits = 2) => (isNum(v) ? v.toFixed(digits) : "—");

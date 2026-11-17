@@ -1,4 +1,7 @@
 import "./styles/global.css";
+import "@fontsource/barlow-condensed/700.css";
+import "@fontsource/barlow-condensed/700-italic.css";
+import "@fontsource/barlow-condensed/800-italic.css";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { StrictMode } from "react";

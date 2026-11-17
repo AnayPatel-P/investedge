@@ -15,9 +15,10 @@ import { ModelGuide, describeLine } from "../components/ModelGuide";
 import { lineShape } from "../chart/lineShape";
 import { Term } from "../components/Term";
 import { PatternPanel } from "../components/PatternPanel";
-import { ScorecardPanel } from "../components/ScorecardPanel";
+import { Icon } from "../components/Icon";
+import { Lineup, LineupStrip, mvpOf } from "../components/Lineup";
 import { Tutor } from "../components/Tutor";
-import { MODEL_BLURB, MODEL_LABEL, longDate, price, shortDate, signedPct } from "../format";
+import { MODEL_LABEL, longDate, price, shortDate, signedPct } from "../format";
 import { usePrefs } from "../state/prefs";
 import "./Stock.css";
 
@@ -26,8 +27,9 @@ const LEVELS = [50, 80, 95];
 const RANGES: Range[] = ["1M", "6M", "1Y", "5Y"];
 
 function defaultsFor(profile: Profile | undefined) {
-  const models: ModelKey[] = profile?.view.default_models ?? ["naive", "arima"];
-  const focus: ModelKey = models.find((m) => m !== "naive") ?? "naive";
+  const models: ModelKey[] = ["naive", "arima", "ets", "prophet", "garch"]; // every player's call is on the chart
+  const preferred: ModelKey[] = profile?.view.default_models ?? ["naive", "arima"];
+  const focus: ModelKey = preferred.find((m) => m !== "naive") ?? "naive";
   const level = profile?.view.bands[profile.view.bands.length - 1] ?? 95;
   return { models, focus, level, emphasis: (profile?.view.emphasis ?? "balanced") as "downside" | "balanced" | "full model spread" };
 }
@@ -49,7 +51,7 @@ export function Stock() {
   const [mode, setMode] = useState<ChartMode>("candles");
   const [range, setRange] = useState<Range>("6M");
   const [focus, setFocus] = useState<ModelKey>(defaults.focus);
-  const [visible, setVisible] = useState<ModelKey[]>(defaults.models);
+  const visible = defaults.models;
   const [level, setLevel] = useState<number>(defaults.level);
   const [stop, setStop] = useState<number | null>(null); // null = today
   const [releaseKey, setReleaseKey] = useState(0);
@@ -65,7 +67,6 @@ export function Stock() {
   // Re-apply profile defaults when the profile (or stock) changes.
   useEffect(() => {
     setFocus(defaults.focus);
-    setVisible(defaults.models);
     setLevel(defaults.level);
     setStop(null);
     setReleaseKey((k) => k + 1);
@@ -123,7 +124,6 @@ export function Stock() {
     const notFound = prices.error instanceof ApiError && prices.error.status === 404;
     return (
       <div className="stock-missing">
-        <p className="kicker">{sym}</p>
         <h1>{notFound ? "That ticker isn't in the S&P 500." : "Couldn't load this stock."}</h1>
         <p>
           <Link to="/">Back to all stocks</Link>
@@ -153,11 +153,11 @@ export function Stock() {
       {/* ------------------------------------------------ the price, first */}
       <header className="stock-head">
         <div className="stock-title">
-          <p className="kicker">
-            {m?.sector ?? " "} {profile && m && <>· <FitBadge fit={m.fit[profile]} /></>}
-          </p>
           <h1 className="stock-ticker">{sym}</h1>
           <p className="stock-name">{m?.name ?? " "}</p>
+          <p className="stock-sector">
+            {m?.sector ?? " "} {profile && m && <>· <FitBadge fit={m.fit[profile]} /></>}
+          </p>
         </div>
         <div className="stock-price">
           <span className="stock-last num" aria-label={last ? `Last close ${price(last.close)}` : undefined}>
@@ -233,56 +233,23 @@ export function Stock() {
           </div>
           {!tooNew && (
             <div className="instrument-row model-row">
-              <div className="model-chips" role="group" aria-label="Forecast models">
-                {MODELS.map((mk) => {
-                  const on = visible.includes(mk) || focus === mk;
-                  return (
-                    <span key={mk} className={`chip${on ? " on" : ""}${focus === mk ? " focus" : ""}`}>
-                      <button
-                        type="button"
-                        aria-pressed={on}
-                        title={MODEL_BLURB[mk]}
-                        onClick={() => setVisible((v) => (v.includes(mk) ? v.filter((x) => x !== mk) : [...v, mk]))}
-                      >
-                        {MODEL_LABEL[mk]}
-                      </button>
-                      <button
-                        type="button"
-                        className="chip-focus"
-                        aria-label={`Draw ${MODEL_LABEL[mk]}'s range and possible futures`}
-                        aria-pressed={focus === mk}
-                        onClick={() => {
-                          setFocus(mk);
-                          setReleaseKey((k) => k + 1);
-                        }}
-                      >
-                        <span aria-hidden="true">{focus === mk ? "●" : "○"}</span>
-                      </button>
-                    </span>
-                  );
-                })}
-              </div>
-              <div className="segmented" role="group" aria-label="Range shown around the focus model">
+              <span className="strip-label">Futures drawn by</span>
+              <LineupStrip
+                available={MODELS.filter((mk) => forecasts.data?.[mk]?.length)}
+                focus={focus}
+                mvp={mvpOf(scorecard.data)}
+                onFocus={(mk) => {
+                  setFocus(mk);
+                  setReleaseKey((k) => k + 1);
+                }}
+              />
+              <div className="segmented" role="group" aria-label="Range shown around the drawn model">
                 {LEVELS.map((lv) => (
                   <button key={lv} type="button" aria-pressed={level === lv} onClick={() => setLevel(lv)}>
                     {lv}%
                   </button>
                 ))}
               </div>
-              <a
-                className="mg-link"
-                href="#model-guide"
-                onClick={(e) => {
-                  e.preventDefault();
-                  const el = document.getElementById("model-guide") as HTMLDetailsElement | null;
-                  if (el) {
-                    el.open = true;
-                    el.scrollIntoView({ behavior: "smooth", block: "start" });
-                  }
-                }}
-              >
-                What are these?
-              </a>
             </div>
           )}
         </div>
@@ -333,7 +300,7 @@ export function Stock() {
               ) : replayOrigin ? (
                 <p>
                   Turned back to <strong>{longDate(replayOrigin)}</strong>.{" "}
-                  <span className="muted">The pencil is what {MODEL_LABEL[focus]} expected then; the violet ink is what happened.</span>
+                  <span className="muted">The coloured futures are what {MODEL_LABEL[focus]} expected then; the navy ink is what happened.</span>
                 </p>
               ) : (
                 <p>
@@ -343,7 +310,7 @@ export function Stock() {
             </div>
             <div className="drum-actions">
               <button type="button" className="btn" onClick={() => setReleaseKey((k) => k + 1)} disabled={turning || phase === "release" || phase === "reality"}>
-                <span aria-hidden="true">↻</span> {replayOrigin ? "Replay" : "Redraw futures"}
+                <Icon name="redraw" /> {replayOrigin ? "Replay" : "Redraw futures"}
               </button>
               {replayOrigin && (
                 <button type="button" className="btn primary" onClick={() => replay(todayIndex)} disabled={turning}>
@@ -372,6 +339,30 @@ export function Stock() {
         {replayOrigin && tally && <TallyCard tally={tally} level={level} show={phase === "done"} />}
       </section>
 
+      {/* ------------------------------------------------ the lineup: every model's record */}
+      {!tooNew && (forecasts.data || scorecard.data) && (
+        <div className="stock-section">
+          <Lineup
+            backtest={backtest.data}
+            scorecard={scorecard.data}
+            available={MODELS.filter((mk) => forecasts.data?.[mk]?.length)}
+            focus={focus}
+            level={level}
+            replayIndex={stop}
+            onFocus={(mk) => {
+              setFocus(mk);
+              setReleaseKey((k) => k + 1);
+            }}
+            onReplay={(mk, i) => {
+              setFocus(mk);
+              if (stop === i) setReleaseKey((k) => k + 1);
+              else setStop(i);
+              document.querySelector(".stock-chart")?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+          />
+        </div>
+      )}
+
       {/* ------------------------------------------------ the outlook, in plain words */}
       {!tooNew && tiles.length > 0 && (
         <section className="stock-section" aria-labelledby="outlook-title">
@@ -388,6 +379,7 @@ export function Stock() {
             )}
           </header>
           <Outlook
+            color={`var(--m-${focus})`}
             tiles={tiles}
             start={view.start}
             level={level}
@@ -410,11 +402,6 @@ export function Stock() {
 
       {/* ------------------------------------------------ the track record and the ride */}
       <div className="stock-lower">
-        {scorecard.data && (
-          <section className="stock-section" aria-labelledby="scorecard-title">
-            <ScorecardPanel card={scorecard.data} compact={terminal} />
-          </section>
-        )}
         {m && (
           <section className="stock-section" aria-labelledby="metrics-title">
             <h2 id="metrics-title">{terminal ? "Risk" : "How bumpy has the ride been?"}</h2>
@@ -458,25 +445,22 @@ function TallyCard({
 }) {
   const name = MODEL_LABEL[tally.model];
   return (
-    <div className={`tally${show ? " show" : ""}`} aria-live="polite">
+    <div className={`tally${show ? " show" : ""}`} aria-live="polite" style={{ "--c": `var(--m-${tally.model})` } as React.CSSProperties}>
       {show && (
         <>
           <div className="tally-face">
-            <p className="kicker">
-              {shortDate(tally.origin)} → {shortDate(tally.endDate)}
-            </p>
             <p className="tally-line">
-              {name} expected about <span className="num">{price(tally.predicted)}</span>. Reality:{" "}
+              From {shortDate(tally.origin)} to {shortDate(tally.endDate)}, {name} expected about <span className="num">{price(tally.predicted)}</span>. Reality:{" "}
               <span className="num">{price(tally.actual)}</span>.
             </p>
             <ul className="tally-checks">
               <li className={tally.inside ? "up" : "down"}>
-                <span aria-hidden="true">{tally.inside ? "✓" : "✗"}</span> {tally.inside ? "Landed inside" : "Landed outside"} the {level}%
+                <Icon name={tally.inside ? "check" : "cross"} /> {tally.inside ? "Landed inside" : "Landed outside"} the {level}%
                 range ({price(tally.lo)}–{price(tally.hi)})
               </li>
               {tally.model !== "naive" && (
                 <li className={tally.beatNaive ? "up" : "down"}>
-                  <span aria-hidden="true">{tally.beatNaive ? "✓" : "✗"}</span>{" "}
+                  <Icon name={tally.beatNaive ? "check" : "cross"} />{" "}
                   {tally.beatNaive ? "Closer than" : "No closer than"} the naive guess (missed by {price(tally.modelMiss)} vs.{" "}
                   {price(tally.naiveMiss)})
                 </li>
@@ -502,7 +486,7 @@ function MarketReadout({ sym, c }: { sym: string; c: Comparison }) {
   return (
     <>
       <p className="market-figures">
-        <span className="kicker">Since {longDate(c.start)}</span>
+        <span className="muted">Since {longDate(c.start)}:</span>
         <span>
           {sym} <span className={`mono ${s.dir}`}>{s.text}</span>
         </span>

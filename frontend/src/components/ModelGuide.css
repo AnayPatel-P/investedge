@@ -15,15 +15,19 @@
   display: none;
 }
 .model-guide > summary::before {
-  content: "›";
+  /* a drawn chevron: two borders of a square, turned */
+  content: "";
   display: inline-block;
-  width: 0.8em;
-  font-weight: 700;
-  color: var(--muted);
+  width: 0.45em;
+  height: 0.45em;
+  margin: 0 0.55em 0.1em 0.1em;
+  border-right: 2px solid var(--muted);
+  border-bottom: 2px solid var(--muted);
+  transform: rotate(-45deg);
   transition: transform var(--t-fast) var(--ease-out);
 }
 .model-guide[open] > summary::before {
-  transform: rotate(90deg);
+  transform: rotate(45deg);
 }
 .mg-summary {
   font-size: var(--step-1);
@@ -147,4 +151,7 @@
   .mg-facts {
     grid-template-columns: 1fr;
   }
+}
+.mg-now-label {
+  font-weight: 650;
 }

@@ -582,9 +582,9 @@ export function FuturesChart(props: FuturesChartProps) {
 
     const surface = css("--surface");
     const ink = css("--reality");
-    const pencil = css("--forecast");
-    const pencilText = css("--forecast-text");
-    const inkSoft = css("--ink-soft");
+    // The drawn model wears its team colour (tokens --m-*); fall back to pencil grey.
+    const pencil = css(`--m-${p.focus}`) || css("--forecast");
+    const pencilText = pencil;
     const down = css("--down");
 
     if (turning) {
@@ -644,7 +644,7 @@ export function FuturesChart(props: FuturesChartProps) {
       const steps = release * H;
       const trailAlpha = parseFloat(css("--trail-alpha")) || 0.07;
 
-      // The focus model's range, in pencil, revealed with the release.
+      // The drawn model's range, in its team colour, revealed with the release.
       if (H) {
         const shown = Math.max(1, Math.ceil(steps));
         const top: [number, number][] = [[x0!, y0!]];
@@ -689,7 +689,7 @@ export function FuturesChart(props: FuturesChartProps) {
         }
       }
 
-      // Possible futures, pencilled in faintly.
+      // Possible futures, drawn faintly in the same colour.
       const paths = pathsRef.current;
       if (paths.length && H) {
         ctx.strokeStyle = pencilText;
@@ -719,7 +719,7 @@ export function FuturesChart(props: FuturesChartProps) {
         ctx.globalAlpha = 1;
       }
 
-      // Each model's central guess. Naive = dotted yardstick; the focus model is the darker pencil.
+      // Each player's central guess, in its team colour and dash. The drawn model is heavier.
       const endLabels: { text: string; x: number; y: number; color: string }[] = [];
       const dashes: Record<string, number[]> = { naive: [2, 3], arima: [6, 3], ets: [10, 3, 2, 3], prophet: [1, 4], garch: [12, 4] };
       for (const m of new Set([...p.visibleModels, p.focus])) {
@@ -736,23 +736,24 @@ export function FuturesChart(props: FuturesChartProps) {
         }
         ctx.setLineDash(dashes[m] ?? []);
         ctx.lineWidth = isFocus ? 2 : 1.25;
-        ctx.strokeStyle = m === "naive" ? inkSoft : isFocus ? pencilText : pencil;
-        ctx.globalAlpha = isFocus || m === "naive" ? 0.95 : 0.75;
+        ctx.strokeStyle = css(`--m-${m}`) || pencil;
+        ctx.globalAlpha = isFocus ? 1 : 0.8;
         ctx.stroke();
         ctx.setLineDash([]);
         ctx.globalAlpha = 1;
         const end = pts[pts.length - 1];
         const ex = x(end.date);
         const ey = y(end.mean);
-        if (ex !== null && ey !== null) endLabels.push({ text: MODEL_LABEL[m] ?? m, x: Math.min(ex, plotW) - 6, y: ey, color: m === "naive" ? inkSoft : pencilText });
+        if (ex !== null && ey !== null) endLabels.push({ text: MODEL_LABEL[m] ?? m, x: Math.min(ex, plotW) - 6, y: ey, color: css(`--m-${m}`) || pencil });
       }
       endLabels.sort((a, b) => a.y - b.y);
       for (let i = 1; i < endLabels.length; i++) {
         if (endLabels[i].y - endLabels[i - 1].y < 13) endLabels[i].y = endLabels[i - 1].y + 13;
       }
-      for (const l of endLabels) label(l.text, l.x, l.y - 9, l.color, "right");
+      // On narrow charts the names pile up on the fan; the lineup's card colours are the legend there.
+      if (plotW >= 480) for (const l of endLabels) label(l.text, l.x, l.y - 9, l.color, "right");
 
-      // Reality, inked in violet through the pencilled futures.
+      // Reality, inked in heavy navy through the coloured futures.
       if (p.reality?.length && realProg > 0) {
         const pts = p.reality;
         const upto = realProg * pts.length;

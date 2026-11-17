@@ -98,3 +98,7 @@
     repeating-conic-gradient(from 0deg, rgba(255, 255, 255, 0.04) 0deg 2deg, transparent 2deg 4deg),
     var(--surface);
 }
+.dial-label {
+  font-size: var(--step--1);
+  color: var(--muted);
+}

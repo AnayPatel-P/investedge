@@ -87,12 +87,14 @@ function Guided({ profile }: { profile: ProfileKey }) {
   return (
     <div className="home">
       <header className="home-head">
-        <p className="kicker">For {profile === "aggressive" ? "an" : "a"} {profile} investor · {rows.length} stocks</p>
         <h1 className="home-title">{HEADLINE[profile]}</h1>
         <p className="home-lede">
+          <strong>
+            {rows.length} stocks for {profile === "aggressive" ? "an" : "a"} {profile} investor.
+          </strong>{" "}
           Every S&amp;P 500 stock, ordered by how well its past <Term k="volatility">swings</Term> match the ride you chose —
-          then by how much <Term k="returnPerRisk">return it earned for each unit of risk</Term> over the last year. That's a
-          description of the past, not a tip.
+          then by how much <Term k="returnPerRisk">return it earned for each unit of risk</Term> over the last year. Risk compares each stock's swings, market sensitivity and drops with the rest of the
+          S&amp;P 500. That's a description of the past, not a tip.
         </p>
         <Filters sector={sector} setSector={setSector} fit={fit} setFit={setFit} />
       </header>
@@ -102,7 +104,7 @@ function Guided({ profile }: { profile: ProfileKey }) {
 
       <ol className="ledger">
         {rows.slice(0, shown).map((r, i) => (
-          <LedgerRow key={r.symbol} row={r} rank={i + 1} />
+          <LedgerRow key={r.symbol} row={r} rank={i + 1} showFit={fit === "all"} />
         ))}
       </ol>
       {rows.length > shown && (
@@ -114,21 +116,24 @@ function Guided({ profile }: { profile: ProfileKey }) {
   );
 }
 
-function LedgerRow({ row, rank }: { row: ScreenerRow; rank: number }) {
+function LedgerRow({ row, rank, showFit }: { row: ScreenerRow; rank: number; showFit: boolean }) {
   const r1y = signedPct(row.return_1y);
   return (
     <li className="ledger-row">
-      <span className="ledger-rank mono">{String(rank).padStart(2, "0")}</span>
+      <span className="ledger-rank num" aria-label={`Rank ${rank}`}>
+        {rank}
+      </span>
       <Link to={`/stock/${row.symbol}`} className="ledger-main">
         <span className="ledger-sym">{row.symbol}</span>
         <span className="ledger-name">{row.name}</span>
         <span className="ledger-sector muted">{row.sector}</span>
       </Link>
       <span className="ledger-meta">
-        <FitBadge fit={row.fit} />
+        {showFit && <FitBadge fit={row.fit} />}
         <RiskMeter score={row.risk_score} level={row.risk_level} />
       </span>
-      <span className="ledger-sentence">{row.risk_sentence}</span>
+      {/* the "(based on swings, ...)" note is explained once in the intro, not on every row */}
+      <span className="ledger-sentence">{row.risk_sentence.replace(/\s*\(based on[^)]*\)/, "")}</span>
       <span className={`ledger-return mono ${r1y.dir}`} title="Price change over the past year">
         {r1y.text}
         <span className="muted"> 1y</span>

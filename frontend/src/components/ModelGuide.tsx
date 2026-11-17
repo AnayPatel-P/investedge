@@ -51,7 +51,6 @@ export function ModelGuide({ sym, lastClose, forecasts, scorecard, focus, onShow
   return (
     <details className="model-guide" id="model-guide" open={defaultOpen}>
       <summary>
-        <span className="kicker">Meet the models</span>
         <span className="mg-summary">What each line means, and how the five models differ</span>
       </summary>
       <p className="mg-lede">
@@ -104,7 +103,7 @@ export function ModelGuide({ sym, lastClose, forecasts, scorecard, focus, onShow
           </dl>
         </div>
         <aside className="mg-live">
-          <p className="kicker">On {sym} right now</p>
+          <p className="mg-now-label">On {sym} right now</p>
           <p>{shape ? describeLine(m, shape, lastClose) : "No forecast for this stock."}</p>
           {row && (
             <p className="muted">

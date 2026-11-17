@@ -1,18 +1,19 @@
 import type { Fit, RiskLevel } from "../api/types";
+import { Icon, type IconName } from "./Icon";
 import "./Badges.css";
 
-const FIT_TEXT: Record<Fit, { label: string; glyph: string }> = {
-  good: { label: "Good fit", glyph: "●" },
-  possible: { label: "Possible fit", glyph: "◐" },
-  outside: { label: "Outside comfort zone", glyph: "○" },
+const FIT_TEXT: Record<Fit, { label: string; icon: IconName }> = {
+  good: { label: "Good fit", icon: "fitGood" },
+  possible: { label: "Possible fit", icon: "fitPossible" },
+  outside: { label: "Outside comfort zone", icon: "fitOutside" },
 };
 
-/** Fit badge: shape glyph + words, so it never relies on color alone. */
+/** Fit badge: shape mark + words, so it never relies on colour alone. */
 export function FitBadge({ fit }: { fit: Fit }) {
   const f = FIT_TEXT[fit];
   return (
     <span className={`fit fit-${fit}`}>
-      <span aria-hidden="true">{f.glyph}</span> {f.label}
+      <Icon name={f.icon} /> {f.label}
     </span>
   );
 }

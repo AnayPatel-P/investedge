@@ -22,11 +22,13 @@ from a chart.
 
 - **Rewind & Release.** The chart works like a barograph drum. Drag it sideways (or flick it) to turn back
   to a past forecast date: the pen lifts, everything after that day disappears, and when the drum settles the
-  model's possible futures are pencilled in and the real price inks itself through them in violet. A small
+  model's possible futures are drawn in its team colour and the real price inks itself through them in navy. A small
   card tells you whether reality stayed inside the model's range and whether it beat the naive guess.
 - **The outlook in plain words.** Under the chart, each horizon says how many of the drawn futures end higher
   ("97 of 180, a coin flip"), next to a calibration tag with the model's real record on that stock.
-- **A scorecard for every stock.** Each model's accuracy compared with the naive guess, how often its 95%
+- **The lineup: a card for every model.** Each model is a player card in its own colour, with its record on that
+  stock; the naive guess wears the MVP star when nothing beats it. Flip a card for its season, one row per replay,
+  and pick a row to turn the chart back to it. The cards show each model's accuracy compared with the naive guess, how often its 95%
   range really caught the price (Prophet's often didn't), and a one-line verdict in plain English.
 - **Risk in plain English.** Volatility, beta against the S&P 500, worst drops, dividend yield, and a risk
   score like "riskier than 22% of S&P 500 stocks".

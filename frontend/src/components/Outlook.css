@@ -1,43 +1,49 @@
 .outlook {
   display: grid;
-  gap: var(--s-4);
+  gap: var(--s-5);
 }
+/* Three horizons as columns divided by rules, not boxes: the count of futures is the headline. */
 .outlook-tiles {
   list-style: none;
   margin: 0;
   padding: 0;
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: var(--s-3);
+  border-top: 2px solid var(--ink);
 }
 .outlook-tile {
   display: grid;
   gap: var(--s-2);
   align-content: start;
-  padding: var(--s-4);
-  background: var(--surface);
-  border-radius: var(--radius-2);
-  box-shadow: inset 0 0 0 1px var(--rule);
+  padding: var(--s-3) var(--s-5) var(--s-3) 0;
+}
+.outlook-tile + .outlook-tile {
+  padding-left: var(--s-5);
+  border-left: var(--hairline);
+}
+.outlook-when {
+  font-family: var(--font-body);
+  font-size: var(--step--1);
+  line-height: var(--lh--1);
+  font-weight: 650;
+  letter-spacing: 0;
 }
 .outlook-date {
-  font-weight: 500;
-  letter-spacing: 0;
-  text-transform: none;
+  font-weight: 400;
+  color: var(--muted);
+  margin-left: var(--s-1);
 }
-.outlook-chance {
-  display: flex;
-  align-items: baseline;
-  gap: var(--s-2);
-}
-.outlook-chance .num {
-  font-size: var(--step-3);
-  line-height: var(--lh-3);
-  letter-spacing: var(--tr-3);
-  font-weight: 300;
-}
-.outlook-chance-label {
+.outlook-count {
   color: var(--ink-soft);
-  font-size: var(--step--1);
+  font-size: var(--step-0);
+}
+.outlook-count .num {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: var(--step-3);
+  line-height: 1;
+  color: var(--c, var(--ink));
 }
 .outlook-words,
 .outlook-range,
@@ -49,7 +55,7 @@
   color: var(--ink-soft);
 }
 .outlook-range {
-  color: var(--forecast-text);
+  color: var(--muted);
 }
 .outlook-actual {
   font-weight: 600;
@@ -57,38 +63,31 @@
   border-top: var(--hairline);
 }
 
-/* The calibration tag: a paper tag tied to the instrument, punched hole and all. */
+/* The model's real record for this range, set as a short note under the columns. */
 .calibration {
-  position: relative;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: var(--s-3);
-  align-items: start;
   max-width: 72ch;
-  padding: var(--s-3) var(--s-4) var(--s-3) var(--s-3);
-  background: var(--surface-2);
-  border-radius: var(--radius-1) var(--radius-2) var(--radius-2) var(--radius-1);
-  box-shadow:
-    inset 0 0 0 1px var(--rule-strong),
-    var(--lift);
   font-size: var(--step--1);
   line-height: var(--lh--1);
+  display: grid;
+  gap: var(--s-1);
 }
-.calibration-hole {
-  width: 12px;
-  height: 12px;
-  margin-top: 2px;
-  border-radius: 50%;
-  background: var(--paper);
-  box-shadow: inset 0 0 0 1.5px var(--rule-strong);
-}
-.calibration p + p {
-  margin-top: 2px;
+.calibration-title {
+  font-family: var(--font-body);
+  font-size: var(--step-0);
+  font-weight: 650;
+  letter-spacing: 0;
 }
 
-:root[data-density="terminal"] .outlook-tile {
-  padding: var(--s-3);
-}
 :root[data-density="terminal"] .outlook-words {
   display: none;
+}
+@media (max-width: 720px) {
+  .outlook-tile,
+  .outlook-tile + .outlook-tile {
+    padding: var(--s-3) 0;
+    border-left: 0;
+  }
+  .outlook-tile + .outlook-tile {
+    border-top: var(--hairline);
+  }
 }

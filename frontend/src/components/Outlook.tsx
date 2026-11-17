@@ -12,13 +12,15 @@ interface Props {
   /** Replays: show what really happened once the ink has been drawn. */
   showActual: boolean;
   totals: { n: number; inside: number; beat: number } | null;
+  /** The drawn model's team colour, for the counts. */
+  color?: string;
 }
 
 /** The outlook strip ("chance it's higher", counted from the drawn futures) and the model's calibration tag. */
-export function Outlook({ tiles, start, level, model, showActual, totals }: Props) {
+export function Outlook({ tiles, start, level, model, showActual, totals, color }: Props) {
   const name = MODEL_LABEL[model];
   return (
-    <div className="outlook">
+    <div className="outlook" style={color ? ({ "--c": color } as React.CSSProperties) : undefined}>
       <ol className="outlook-tiles">
         {tiles.map((t) => {
           const pctHigher = Math.round(t.chance * 100);
@@ -26,16 +28,17 @@ export function Outlook({ tiles, start, level, model, showActual, totals }: Prop
           const inside = t.actual !== undefined && t.actual >= t.lo && t.actual <= t.hi;
           return (
             <li key={t.date} className="outlook-tile">
-              <p className="kicker">
-                {t.label} <span className="outlook-date">· {shortDate(t.date)}</span>
-              </p>
-              <p className="outlook-chance">
-                <span className="num">{pctHigher}%</span>
-                <span className="outlook-chance-label">chance it's higher</span>
+              <h3 className="outlook-when">
+                {t.label} <span className="outlook-date">{shortDate(t.date)}</span>
+              </h3>
+              <p className="outlook-count">
+                <span className="num">
+                  {t.higher} of {t.total}
+                </span>{" "}
+                futures end higher
               </p>
               <p className="outlook-words">
-                <strong>{chanceWords(t.chance)}.</strong> {t.higher} of {t.total} possible futures end above{" "}
-                <span className="num">{price(start)}</span>.
+                <strong>{chanceWords(t.chance)}</strong>, about {pctHigher}%, measured from <span className="num">{price(start)}</span>.
               </p>
               <p className="outlook-range">
                 <Term k="forecastRange">{level}% range</Term>{" "}
@@ -45,7 +48,7 @@ export function Outlook({ tiles, start, level, model, showActual, totals }: Prop
               </p>
               {showActual && went && t.actual !== undefined && (
                 <p className={`outlook-actual ${went === "higher" ? "up" : "down"}`}>
-                  <span aria-hidden="true">{went === "higher" ? "▲" : "▼"}</span> Actually{" "}
+                  Actually{" "}
                   <span className="num">{price(t.actual)}</span>, {went}
                   {inside ? ", inside the range" : ", outside the range"}
                 </p>
@@ -57,9 +60,8 @@ export function Outlook({ tiles, start, level, model, showActual, totals }: Prop
 
       {totals && totals.n > 0 && (
         <aside className="calibration" aria-label="How reliable this model's range has been">
-          <span className="calibration-hole" aria-hidden="true" />
           <div>
-            <p className="kicker">Calibration · {name}, {level}% range</p>
+            <h3 className="calibration-title">How honest is {name}'s {level}% range?</h3>
             <p>
               Over the last {totals.n} monthly replays, the real price landed inside this range{" "}
               <strong className="num">

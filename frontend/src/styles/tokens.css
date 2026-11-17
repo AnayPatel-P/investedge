@@ -1,42 +1,58 @@
-/* InvestEdge design tokens: "The Recording Drum" (DECISIONS D56).
-   The stock chart is a barograph drum: violet ink is reality, pencil is the models' guesses,
-   and the page around it is enamel with a fine graph grid. Guided = daylight enamel;
-   Terminal = a designed night version (lifted surfaces, lower saturation), not an inversion. */
+/* InvestEdge design tokens: "The Lineup" (DECISIONS D57).
+   Forecasting models are players with a public record. Each wears a team colour on its card and its
+   line; reality is heavy navy ink; the page is a cool neutral ground under a navy shell.
+   The chart keeps the Recording Drum mechanics (D56). Terminal = a night-game version, not an inversion. */
 
 :root {
-  /* ---- color: surfaces (three elevations) */
-  --paper: #f5f3ee; /* enamel: page background */
-  --paper-deep: #ece9e2; /* recessed: wells, skeletons */
-  --surface: #fbfaf7; /* raised: panels, the drum */
-  --surface-2: #ffffff; /* highest: popovers, tooltips */
+  /* ---- color: surfaces. A cool neutral ramp; colour belongs to the models. */
+  --paper: #f5f6f8; /* page ground */
+  --paper-deep: #e7eaf0; /* recessed: wells, skeletons */
+  --surface: #fbfcfd; /* raised: panels, the drum */
+  --surface-2: #ffffff; /* highest: cards, popovers */
+  --shell: #1f2a60; /* navy: the top bar, primary actions */
+  --shell-2: #2a3775;
+  --on-shell: #ffffff;
+  --on-shell-muted: #b9c1e6;
 
   /* ---- color: text */
-  --ink: #1a2230; /* 14.6:1 on paper */
-  --ink-soft: #3a4352; /* 9.6:1 */
-  --muted: #5d6573; /* 5.4:1, the lowest text contrast we allow */
+  --ink: #161c3a; /* 15:1 on paper */
+  --ink-soft: #343c5c;
+  --muted: #565d75; /* 5.6:1 on paper, the lowest text contrast we allow */
 
-  /* ---- color: lines. --rule is the graph grid; --rule-strong separates sections */
-  --rule: #dde1e5;
-  --rule-strong: #b9c0c8;
-  --grid-minor: rgba(26, 34, 48, 0.045);
-  --grid-major: rgba(26, 34, 48, 0.085);
+  /* ---- color: lines */
+  --rule: #d9dde6;
+  --rule-strong: #b3b9c8;
+  --grid-minor: rgba(22, 28, 58, 0.045);
+  --grid-major: rgba(22, 28, 58, 0.085);
 
-  /* ---- color: meaning. One accent only: violet = the pen = what really happened. */
-  --reality: #5b4fa8; /* barograph ink, 6.3:1 on paper */
-  --accent: var(--reality);
-  --forecast: #7d8591; /* pencil: model guesses (graphics) */
-  --forecast-text: #545c68; /* pencil for text, 6.1:1 */
-  --up: #2b7a6a; /* 4.9:1 */
-  --down: #b4503a; /* 4.8:1 */
-  --good: #2b7a6a;
+  /* ---- color: the lineup. Each model wears its team colour on its card and its line. */
+  --m-naive: #5c6470;
+  --m-arima: #c2540a; /* burnt orange, 4.6:1 on white; kept clear of the down-candle red */
+  --m-ets: #1b8048; /* kelly, 4.9:1 */
+  --m-prophet: #6247d1; /* violet, 6.6:1 */
+  --m-garch: #a87700; /* gold ink for text and lines, 4.5:1 */
+  --m-garch-bright: #f2b705; /* gold card border */
+  --mvp: #f2b705;
+  --on-mvp: #1f2a60; /* navy on gold in both themes */
+  --card-stock: #e8e5dc; /* the grey board on a card back */
+  --card-red: #b02f25; /* second ink on card backs */
+
+  /* ---- color: meaning */
+  --reality: #1f2a60; /* what really happened: heavy navy ink */
+  --accent: var(--shell);
+  --forecast: #7d8591; /* fallback pencil when no model is focused */
+  --forecast-text: #545c68;
+  --up: #1b7a55;
+  --down: #c03a26;
+  --good: #1b7a55;
   --possible: #8a6414;
-  --outside: #b4503a;
-  --focus: #5b4fa8;
+  --outside: #c03a26;
+  --focus: #3550c8;
   --trail-alpha: 0.075;
 
-  /* ---- type: the system face (optical sizes built in). No display face: the numbers are the display. */
+  /* ---- type: system UI for reading and data; one condensed athletic face for names and titles. */
   --font-body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
-  --font-display: var(--font-body);
+  --font-display: "Barlow Condensed", "Arial Narrow", var(--font-body); /* card names, page titles: the athletic voice */
   --font-ui: var(--font-body);
   --font-code: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
 
@@ -99,26 +115,35 @@
 }
 
 :root[data-density="terminal"] {
-  --paper: #11151b;
-  --paper-deep: #0c0f13;
-  --surface: #181d25; /* lifted by lightness, not shadow */
-  --surface-2: #202631;
-  --ink: #e6e9ee;
-  --ink-soft: #c3c8d0;
-  --muted: #959daa; /* 6.6:1 */
-  --rule: #262d38;
-  --rule-strong: #3a4250;
-  --grid-minor: rgba(230, 233, 238, 0.035);
-  --grid-major: rgba(230, 233, 238, 0.07);
-  --reality: #a99ff0; /* violet, desaturated and lifted for the dark */
+  --paper: #0d1230;
+  --paper-deep: #090d24;
+  --surface: #141a3d; /* lifted by lightness, not shadow */
+  --surface-2: #1b2249;
+  --shell: #070a1f;
+  --shell-2: #141a3d;
+  --ink: #e7eaf5;
+  --ink-soft: #c4c9dc;
+  --muted: #98a0bd;
+  --rule: #252c55;
+  --rule-strong: #39416d;
+  --grid-minor: rgba(231, 234, 245, 0.035);
+  --grid-major: rgba(231, 234, 245, 0.07);
+  --m-naive: #a3aab8;
+  --m-arima: #ffa04d;
+  --m-ets: #5fd394;
+  --m-prophet: #a996ff;
+  --m-garch: #f5c84a;
+  --card-stock: #232a52;
+  --card-red: #ff8a6e;
+  --reality: #ffffff;
   --forecast: #8c94a1;
   --forecast-text: #aab1bc;
-  --up: #6fbfae;
-  --down: #e58f78;
-  --good: #6fbfae;
-  --possible: #d9b064;
-  --outside: #e58f78;
-  --focus: #a99ff0;
+  --up: #5fd394;
+  --down: #ff8a6e;
+  --good: #5fd394;
+  --possible: #f5c84a;
+  --outside: #ff8a6e;
+  --focus: #8ea2ff;
   --trail-alpha: 0.1;
 
   --step-0: 0.9375rem;

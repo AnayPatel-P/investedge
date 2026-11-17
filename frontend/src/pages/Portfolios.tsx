@@ -17,10 +17,9 @@ export function Portfolios() {
   return (
     <div className="portfolios">
       <header className="pf-head">
-        <p className="kicker">Example portfolios · for learning</p>
         <h1 className="pf-title">Ten stocks swing less than one.</h1>
         <p className="pf-lede">
-          See what <Term k="diversification">spreading money across sectors</Term> does to the ride. These baskets are built by a fixed, visible rule from past data —
+          <strong>Example portfolios, for learning.</strong> See what <Term k="diversification">spreading money across sectors</Term> does to the ride. These baskets are built by a fixed, visible rule from past data —
           they're illustrations, not recommendations.
         </p>
         <div className="segmented" role="group" aria-label="Profile">
