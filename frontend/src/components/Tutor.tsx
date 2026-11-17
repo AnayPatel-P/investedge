@@ -4,6 +4,9 @@ import type { ProfileKey } from "../api/types";
 import { RichText } from "./RichText";
 import "./Tutor.css";
 
+/** Recorded walkthrough of the Claude tutor, shown on the static demo (which has no tutor). Empty = hidden. */
+export const TUTOR_DEMO_URL = "";
+
 const TOOL_LABEL: Record<string, string> = {
   get_metrics: "risk metrics",
   get_forecasts: "forecasts",
@@ -45,8 +48,16 @@ export function Tutor({ symbol, profile }: { symbol: string; profile: ProfileKey
         <p className="tutor-off">
           The AI tutor runs in the full version of InvestEdge. It needs a server holding an Anthropic API key, so it's switched
           off on this free demo site.{" "}
-          <a href="https://github.com/AnayPatel-P/investedge#ai-tutor-optional" target="_blank" rel="noreferrer">
-            See how to run it yourself
+          {TUTOR_DEMO_URL && (
+            <>
+              <a href={TUTOR_DEMO_URL} target="_blank" rel="noreferrer">
+                Watch it answer questions
+              </a>
+              , or{" "}
+            </>
+          )}
+          <a href="https://github.com/AnayPatel-P/investedge#choosing-the-tutors-model" target="_blank" rel="noreferrer">
+            {TUTOR_DEMO_URL ? "see" : "See"} how it was tested and how to run it yourself
           </a>
           .
         </p>
